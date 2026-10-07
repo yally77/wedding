@@ -1,0 +1,13 @@
+[build]
+  command = "mkdir -p public netlify/functions && cp index.html public/index.html && cp netlify-guestbook.mjs netlify/functions/guestbook.mjs"
+  publish = "public"
+  functions = "netlify/functions"
+[build.environment]
+  NODE_VERSION = "22"
+[functions]
+  node_bundler = "esbuild"
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/guestbook/:splat"
+  status = 200
+  force = true
