@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ko">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>우리의 작은 결혼식 · 픽셀 방명록</title>
+<head>
+<meta name="guestbook-api-base" content=""><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>우리의 작은 결혼식 · 픽셀 방명록</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;600&display=swap');
 :root{--ink:#43573e;--muted:#889579;--line:#e1e6d6;--paper:#fffef6}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:#b9d39b;color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-size:13px;overflow:hidden}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button:focus-visible{outline:3px solid #ab9863;outline-offset:3px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -25,7 +26,7 @@ dialog{color:var(--ink);border:1px solid #e0e5d1;background:var(--paper);border-
 <dialog id="gardenMenu" class="small-dialog" aria-labelledby="menuTitle"><div class="dialog-heading"><h2 id="menuTitle">작은 정원</h2><button type="button" id="closeMenu" class="dialog-close" aria-label="정원 메뉴 닫기">×</button></div><p id="guestCount" class="menu-description"></p><button id="openNotes" class="menu-item" type="button">♡ &nbsp; 도착한 방명록 읽기</button><button id="motionToggle" class="menu-item" aria-pressed="false" type="button">Ⅱ &nbsp; 움직임 쉬어가기</button><button id="openAdmin" class="menu-item" type="button">⚙ &nbsp; 관리자 모드</button></dialog>
 <dialog id="notesDialog" class="notes-dialog" aria-labelledby="notesTitle"><div class="dialog-heading"><h2 id="notesTitle">도착한 마음들</h2><button id="closeNotes" class="dialog-close" type="button" aria-label="방명록 목록 닫기">×</button></div><p id="noteCount" class="menu-description"></p><div id="messageList" hidden></div><div id="allMessages"></div></dialog>
 <div class="toast" id="toast" role="status"></div>
-<dialog id="adminDialog" class="admin-dialog" aria-labelledby="adminTitle"><div class="dialog-heading"><h2 id="adminTitle">작은 정원 관리하기</h2><button type="button" class="dialog-close" id="closeAdmin" aria-label="관리자 창 닫기">×</button></div><p class="admin-description" id="adminDescription"></p><form id="adminLogin"><label class="input-label" for="adminPassword">관리자 비밀번호</label><input type="password" id="adminPassword" autocomplete="current-password" placeholder="관리자 비밀번호를 입력해 주세요" required><button type="submit" class="submit">관리자 로그인</button></form><p class="admin-error" id="adminError" role="status"></p><section id="adminContent" hidden><div class="admin-toolbar"><span id="adminCount"></span><button type="button" class="secondary" id="adminLogout">관리자 모드 종료</button></div><div id="deleteConfirm" class="delete-confirm" hidden><p id="deletePrompt"></p><button type="button" class="danger" id="confirmDelete">삭제하기</button><button type="button" class="secondary" id="cancelDelete">취소</button></div><div id="adminList"></div></section></dialog>
+<dialog id="adminDialog" class="admin-dialog" aria-labelledby="adminTitle"><div class="dialog-heading"><h2 id="adminTitle">작은 정원 관리하기</h2><button type="button" class="dialog-close" id="closeAdmin" aria-label="관리자 창 닫기">×</button></div><p class="admin-description" id="adminDescription"></p><form id="adminLogin"><label class="input-label" for="adminPassword">관리자 비밀번호</label><input type="password" id="adminPassword" autocomplete="current-password" placeholder="관리자 비밀번호를 입력해 주세요" required><button type="submit" class="submit">관리자 로그인</button></form><p class="admin-error" id="adminError" role="status"></p><button type="button" class="secondary" id="retryConnection" hidden>연결 다시 확인</button><section id="adminContent" hidden><div class="admin-toolbar"><span id="adminCount"></span><button type="button" class="secondary" id="adminLogout">관리자 모드 종료</button></div><div id="deleteConfirm" class="delete-confirm" hidden><p id="deletePrompt"></p><button type="button" class="danger" id="confirmDelete">삭제하기</button><button type="button" class="secondary" id="cancelDelete">취소</button></div><div id="adminList"></div></section></dialog>
 <script>
 'use strict';
 const $=s=>document.querySelector(s), canvas=$('#garden'),ctx=canvas.getContext('2d'),av=$('#avatar').getContext('2d');
@@ -288,13 +289,22 @@ function clampInput(el,max){const arr=Array.from(el.value);if(arr.length>max)el.
 function toast(msg){if($('#editorDialog').open)$('#editorStatus').textContent=msg;$('#toast').textContent=msg;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4200)}
 function selectGuest(g){selected=g;let n=$('#selectedNote');n.style.display='block';n.querySelector('b').textContent=g.name+'님의 마음';n.querySelector('span').textContent=g.message}
 function refreshNotes(){$('#guestCount').textContent=guests.length+'명의 마음이 모였어요';$('#noteCount').textContent='총 '+guests.length+'개 · 기본 하객 '+guests.filter(g=>g.example).length+'명 포함';for(let [id,items]of[['#messageList',[...guests].reverse().slice(0,3)],['#allMessages',[...guests].reverse()]]){let root=$(id);root.replaceChildren();items.forEach(g=>{let note=document.createElement('button');note.className='mini-note';note.type='button';note.style.textAlign='left';note.style.color='#536348';let n=document.createElement('b'),m=document.createElement('span');n.textContent=g.name+(examples.includes(g)?'':'')+' 님';m.textContent=g.message;note.append(n,m);note.onclick=()=>{$('#notesDialog').close();selectGuest(g);canvas.scrollIntoView({behavior:paused?'instant':'smooth',block:'center'})};root.append(note)})}}
+const apiBase=(document.querySelector('meta[name="guestbook-api-base"]')?.content||'').trim().replace(/\/$/,'');
+const needsServer=location.hostname.endsWith('.github.io')&&!apiBase;
+const unavailableMessage=needsServer?'방명록 저장 서버가 아직 연결되지 않았어요. 현재는 정원을 둘러볼 수 있으며, 방명록 작성과 관리자 기능은 서버 연결 후 사용할 수 있어요.':'공유 서버에 연결하지 못했어요. 잠시 후 연결을 다시 확인해 주세요.';
+let connectionState=location.protocol==='file:'?'local':needsServer?'unconfigured':'connecting';
 let serverMode=false,serverReady=location.protocol==='file:',posting=false,syncing=false,revision=0;
 let adminActive=false,adminToken='',editingId=null,pendingDelete=null;
 const payload=g=>({name:g.name,message:g.message,skin:g.skin,hair:g.hair,color:g.color,shirt:g.shirt,outfit:g.outfit||0,accessory:g.accessory||0});
 async function api(path,method='GET',body){
- const response=await fetch(path,{method,cache:'no-store',headers:{'Content-Type':'application/json',...(adminToken?{Authorization:'Bearer '+adminToken}:{})},...(body?{body:JSON.stringify(body)}:{})});
- const data=await response.json();if(!response.ok){if(response.status===401){adminToken='';adminActive=false;updateAdminUI()}throw Error(data.error||'요청을 처리하지 못했습니다.')}return data;
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
+ try{
+  const response=await fetch(apiBase+path,{method,cache:'no-store',signal:controller.signal,headers:{'Content-Type':'application/json',...(adminToken?{Authorization:'Bearer '+adminToken}:{})},...(body?{body:JSON.stringify(body)}:{})});
+  if(!response.headers.get('content-type')?.includes('application/json'))throw Error('방명록 저장 서버가 응답하지 않습니다. 서버 연결 설정을 확인해 주세요.');
+  const data=await response.json();if(!response.ok){if(response.status===401){adminToken='';adminActive=false;updateAdminUI()}throw Error(data.error||'요청을 처리하지 못했습니다.')}return data;
+ }catch(e){if(e.name==='AbortError')throw Error('서버 응답이 늦어 연결을 중단했어요. 다시 시도해 주세요.');throw e}finally{clearTimeout(timer)}
 }
+
 function clearEdit(){editingId=null;$('#editBanner').hidden=true;$('#cancelEdit').hidden=true;$('.panel').classList.remove('editing');$('#guestForm .submit').textContent='♡  축하하는 마음 남기기  ↗';$('#guestName').value='';$('#guestMessage').value='';$('#charCount').textContent='0'}
 function closeEditor(){if(posting)return;$('#editorDialog').close()}
 $('#openWriter').onclick=()=>{$('#editorStatus').textContent='';$('#editorDialog').showModal()};
@@ -306,7 +316,7 @@ $('#closeMenu').onclick=()=>$('#gardenMenu').close();
 $('#openNotes').onclick=()=>{$('#gardenMenu').close();$('#notesDialog').showModal()};
 $('#closeNotes').onclick=()=>$('#notesDialog').close();
 $('#guestForm').onsubmit=async e=>{
- e.preventDefault();if(posting)return;if(!serverReady){toast('공유 방명록에 연결 중입니다. 잠시 후 다시 시도해 주세요.');return}
+ e.preventDefault();if(posting)return;if(!serverReady){toast(connectionState==='connecting'?'공유 방명록에 연결 중입니다. 잠시 후 다시 시도해 주세요.':unavailableMessage);return}
  const name=$('#guestName').value.trim(),message=$('#guestMessage').value.trim();
  if(!name||!message){toast('이름과 축하 메시지를 모두 적어 주세요.');return}
  if(Array.from(name).length>10||Array.from(message).length>30){toast('이름은 10자, 메시지는 30자 이내로 적어 주세요.');return}
@@ -324,11 +334,13 @@ $('#guestForm').onsubmit=async e=>{
 };
 function updateAdminUI(){
  $('#adminContent').hidden=!adminActive;$('#adminLogin').hidden=adminActive||!serverReady;
- $('#adminDescription').textContent=serverMode?'생성된 미니미의 외형과 방명록을 수정하거나 삭제할 수 있어요.':serverReady?'관리자 비밀번호를 입력하면 이 브라우저의 하객과 방명록을 관리할 수 있어요.':'공유 서버에 연결 중입니다.';
+ $('#adminDescription').textContent=serverMode&&serverReady?'생성된 미니미의 외형과 방명록을 수정하거나 삭제할 수 있어요.':serverReady?'관리자 비밀번호를 입력하면 이 브라우저의 하객과 방명록을 관리할 수 있어요.':connectionState==='connecting'?'공유 서버에 연결 중입니다.':unavailableMessage;
+ $('#retryConnection').hidden=serverReady||needsServer;$('#retryConnection').disabled=syncing;
  $('#openAdmin').textContent=adminActive?'⚙ 관리자 모드 · 사용 중':'⚙ 관리자 모드';
  if(adminActive)renderAdminList();else{$('#adminList').replaceChildren();$('#deleteConfirm').hidden=true;pendingDelete=null}
 }
 $('#openAdmin').onclick=()=>{$('#gardenMenu').close();$('#adminError').textContent='';updateAdminUI();$('#adminDialog').showModal()};
+$('#retryConnection').onclick=()=>syncGuests();
 $('#closeAdmin').onclick=()=>$('#adminDialog').close();
 $('#adminLogin').onsubmit=async e=>{
  e.preventDefault();if(!serverReady)return;const button=$('#adminLogin button');if(button.disabled)return;button.disabled=true;$('#adminError').textContent='';
@@ -359,15 +371,17 @@ $('#confirmDelete').onclick=async()=>{
 };
 canvas.onclick=e=>{let box=canvas.getBoundingClientRect(),x=(e.clientX-box.left)*canvas.width/box.width,y=(e.clientY-box.top)*canvas.height/box.height;let g=[...guests].sort((a,b)=>b.y-a.y).find(g=>Math.abs(g.x-x)<37&&y>g.y-80&&y<g.y+55);if(g)selectGuest(g);else{selected=null;$('#selectedNote').style.display='none'}};canvas.style.cursor='pointer';$('#selectedNote button').onclick=()=>{selected=null;$('#selectedNote').style.display='none'};function motionLabel(){$('#motionToggle').textContent=paused?'▷  움직임 다시 시작':'Ⅱ  움직임 쉬어가기';$('#motionToggle').setAttribute('aria-pressed',paused)}$('#motionToggle').onclick=()=>{paused=!paused;motionLabel()};motionLabel();resizeScene();addEventListener('resize',resizeScene);renderAvatar();refreshNotes();requestAnimationFrame(draw);
 async function syncGuests(){
- if(location.protocol==='file:'||posting||syncing)return;syncing=true;const version=revision;
- try{const remote=await api('/api/guests');if(!Array.isArray(remote)||version!==revision)return;
+ if(location.protocol==='file:'||posting||syncing)return;
+ if(needsServer){connectionState='unconfigured';$('.privacy').textContent=unavailableMessage;if($('#adminDialog').open)updateAdminUI();return}
+ syncing=true;const version=revision;if(!serverReady){connectionState='connecting';if($('#adminDialog').open)updateAdminUI()}
+ try{const remote=await api('/api/guests');if(!Array.isArray(remote))throw Error('방명록 응답 형식이 올바르지 않습니다.');if(version!==revision)return;
  if(!serverMode){guests=[];selected=null;$('#selectedNote').style.display='none';serverMode=true;adminActive=false;$('.privacy').textContent='모두의 축하가 함께 모이는 정원 · 작성한 글은 서버에 저장됩니다.'}
  const ids=new Set(remote.map(g=>g.id));guests=guests.filter(g=>ids.has(g.id));
  for(const g of remote){const current=guests.find(p=>p.id===g.id);if(current)Object.assign(current,g);else addGuest({...g,outfit:g.outfit||0,accessory:g.accessory||0},guests.length)}
  if(selected){const current=guests.find(g=>g.id===selected.id);if(current)selectGuest(current);else{selected=null;$('#selectedNote').style.display='none'}}
  if(editingId&&!ids.has(editingId)){clearEdit();toast('다른 관리자가 이 미니미를 삭제했습니다.')}
- serverReady=true;refreshNotes();if($('#adminDialog').open)updateAdminUI();
- }catch(e){if(!serverReady)$('.privacy').textContent='공유 서버에 연결할 수 없습니다. server.mjs를 실행해 주세요.'}finally{syncing=false}
+ serverReady=true;connectionState='connected';$('.privacy').textContent='모두의 축하가 함께 모이는 정원 · 작성한 글은 서버에 저장됩니다.';refreshNotes();if($('#adminDialog').open)updateAdminUI();
+ }catch(e){connectionState='error';serverReady=false;$('.privacy').textContent=unavailableMessage}finally{syncing=false;if($('#adminDialog').open)updateAdminUI()}
 }
 syncGuests();setInterval(syncGuests,5000);
 
