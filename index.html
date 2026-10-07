@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>우리의 작은 결혼식 · 픽셀 방명록</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+:root{--ink:#43573e;--muted:#889579;--line:#e1e6d6;--paper:#fffef6}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:#b9d39b;color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-size:13px;overflow:hidden}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button:focus-visible{outline:3px solid #ab9863;outline-offset:3px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.garden-world{position:fixed;inset:0}#garden{display:block;width:100%;height:100%;image-rendering:pixelated}.garden-actions{position:absolute;inset:auto 0 0;display:flex;justify-content:space-between;align-items:center;padding:22px max(24px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));pointer-events:none}.garden-actions button{pointer-events:auto;border:1px solid #f6f3dc90;color:#60714e;background:#fffbeaD9;box-shadow:0 2px 0 #7b936124;backdrop-filter:blur(5px)}.write-button{border-radius:24px;padding:12px 19px;font-size:12px;display:flex;gap:9px;align-items:center}.write-button span{font-size:17px;line-height:1}.write-button:hover{background:#fffcec}.quiet-menu{width:36px;height:30px;border-radius:15px;font-size:20px;line-height:16px;letter-spacing:2px}.garden-actions .quiet-menu{background:#fffbea91;border-color:#f6f3dc50;color:#6f8159}
+.selected-note{position:fixed;top:20px;left:50%;transform:translateX(-50%);max-width:calc(100% - 36px);width:max-content;min-width:190px;background:#fffef1;border:0;border-radius:20px;padding:16px 42px 14px 19px;line-height:1.8;font-size:13px;box-shadow:none;display:none}.selected-note b{display:block;font-size:10px;color:#8b9878;margin-bottom:4px}.selected-note button{position:absolute;right:9px;top:9px;background:none;border:0;color:#8a9876;font-size:18px}
+dialog{color:var(--ink);border:1px solid #e0e5d1;background:var(--paper);border-radius:20px;padding:24px;max-height:calc(100dvh - 40px);overflow:auto;overscroll-behavior:contain;box-shadow:0 20px 100px #334a3033}dialog::backdrop{background:#4f68424a;backdrop-filter:blur(4px)}h2{font-family:'Gowun Dodum',serif;font-size:23px;font-weight:400;letter-spacing:-.7px;margin:0}.dialog-heading,.editor-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}.dialog-close{border:0;background:#f0f2e6;border-radius:50%;width:30px;height:30px;flex-shrink:0;font-size:21px;color:#869372;display:grid;place-items:center;line-height:1}.editor-dialog{width:min(790px,calc(100% - 28px));padding:26px}.editor-heading{margin-bottom:20px;position:sticky;top:-26px;background:var(--paper);padding:8px 0 12px;z-index:2}.panel-kicker{font-size:8px;letter-spacing:2px;color:#9ba687;margin-bottom:8px}.editor-grid{display:grid;grid-template-columns:1.16fr 1fr;gap:28px}.message-editor{border-left:1px dashed var(--line);padding-left:28px}.message-heading{text-align:center;padding:35px 0 20px}.message-heading>span{color:#d6a993;font-size:29px}.message-heading h3{font-family:'Gowun Dodum',serif;font-size:19px;font-weight:400;margin:10px 0}.message-heading p{font-size:11px;line-height:1.9;color:#94a082;margin:0}.avatar-box{position:relative;background:#eff3e3;background-image:linear-gradient(45deg,#e7edd8 25%,transparent 25%),linear-gradient(-45deg,#e7edd8 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e7edd8 75%),linear-gradient(-45deg,transparent 75%,#e7edd8 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border:1px solid #e4e9d6;border-radius:12px;text-align:center;margin:0 0 18px;padding:0 0 8px}.avatar-box:before{content:'MY MINI ME';position:absolute;top:13px;left:13px;font-size:8px;letter-spacing:1.5px;color:#a1ad8d}#avatar{width:126px;height:126px;display:block;margin:auto;image-rendering:pixelated}.avatar-caption{font-size:9px;color:#899a70}.random{position:absolute;right:10px;bottom:10px;width:28px;height:28px;border:1px solid #dce3ce;border-radius:7px;background:#fcfcf5;color:#7e8d6b;font-size:16px}.option-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.option-row .label{width:45px;font-size:10px;color:#8c997c}.swatch{width:25px;height:25px;border:3px solid var(--paper);border-radius:50%;outline:1px solid transparent}.swatch[aria-pressed=true]{outline:1.5px solid #799559}.wardrobe-heading{display:flex;justify-content:space-between;margin:16px 0 8px;font-size:11px}.wardrobe-heading small{font-size:8px;color:#a4ae93;letter-spacing:1px}.style-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.style-card{min-width:0;background:#f4f5ec;border:1px solid #e6e9da;border-radius:7px;padding:3px 0 5px;color:#849273;font-size:9px;display:flex;flex-direction:column;align-items:center;gap:2px}.style-card canvas{width:43px;height:46px;image-rendering:pixelated}.style-card[aria-pressed=true]{background:#e6eed7;border:2px solid #8ba46c;padding:2px 0 4px;color:#4c633b}.style-card:hover{background:#edf1e1}.style-tip{font-size:8px;color:#a1ad90;text-align:right;margin:8px 0 0}.input-label{display:flex;justify-content:space-between;margin:17px 0 8px;font-size:11px}label small{font-size:9px;color:#a6af97}input,textarea{width:100%;background:#fbfcf4;border:1px solid #dfe5d1;border-radius:8px;padding:12px;color:#4e633e;outline:none;font-size:12px}input:focus,textarea:focus{border-color:#92a775;box-shadow:0 0 0 3px #eff3e5}textarea{height:126px;resize:vertical;line-height:1.9}::placeholder{color:#aab29e}.submit{width:100%;border:1px solid #788e5a;border-radius:9px;background:#788e5a;padding:13px;color:#fffef6;font-size:12px;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:20px}.submit:hover{background:#687f4b}.privacy{font-size:9px;line-height:1.8;text-align:center;color:#a2ad91;margin:13px 0 0}.editor-status{font-size:11px;color:#a37752;line-height:1.8}.editor-status:empty{display:none}.secondary{border:1px solid #dce2d0;background:#f5f6ef;color:#657753;border-radius:7px;padding:9px 12px;font-size:11px}.cancel-edit{width:100%;margin-top:10px}.edit-banner{padding:12px;background:#f4ecd9;border:1px solid #e3d4aa;border-radius:8px;color:#7e683b;font-size:11px;line-height:1.8;margin-bottom:14px}.panel.editing{border-color:#c8b27d}.small-dialog{width:min(310px,calc(100% - 32px))}.menu-description{font-size:11px;color:#94a080;margin:14px 0 20px}.menu-item{display:block;width:100%;text-align:left;background:#f3f5e9;border:1px solid #e4e9d5;border-radius:9px;padding:13px;margin:8px 0;color:#788965;font-size:12px}.notes-dialog,.admin-dialog{width:min(590px,calc(100% - 28px))}#allMessages{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mini-note{border:1px solid #e2e7d3;border-radius:9px;padding:13px;background:#f3f5e9;font-size:12px;line-height:1.7;overflow-wrap:anywhere}.mini-note b{display:block;font-size:10px;color:#8b9879;margin-bottom:7px;font-weight:400}.admin-description{font-size:12px;line-height:1.8;color:#89967b}.admin-toolbar{display:flex;justify-content:space-between;align-items:center;margin:16px 0;font-size:11px;color:#8a957c}.admin-row{display:flex;gap:12px;align-items:center;border-top:1px solid #e6e9dc;padding:13px 0}.admin-row canvas{width:50px;height:64px;image-rendering:pixelated;background:#f0f3e6;border-radius:8px;flex-shrink:0}.admin-copy{min-width:0;flex:1;font-size:12px;overflow-wrap:anywhere}.admin-copy b{display:block;margin-bottom:5px}.admin-copy p{margin:0;color:#879477;font-size:11px;line-height:1.7}.admin-actions{display:flex;gap:5px}.danger{background:#fff4ef;border:1px solid #e8c6b8;color:#b36c58;border-radius:7px;padding:9px 12px;font-size:11px}.admin-empty{padding:25px 10px;text-align:center;color:#8a967d;font-size:12px;line-height:1.8}.admin-error{font-size:11px;color:#b06750;line-height:1.8}.delete-confirm{border:1px solid #e5c8b9;border-radius:10px;background:#fff5ed;padding:15px;margin:12px 0;font-size:12px;line-height:1.8}.delete-confirm p{margin:0 0 12px}.delete-confirm button{margin-right:6px}.toast{position:fixed;bottom:82px;left:50%;transform:translate(-50%,12px);background:#fffcedf5;color:#657a4e;border:1px solid #e3e7ce;padding:13px 19px;border-radius:12px;z-index:10;opacity:0;transition:.2s;pointer-events:none;font-size:12px;max-width:calc(100% - 36px);width:max-content;line-height:1.7;box-shadow:0 3px 16px #62774715}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:650px){.editor-dialog{padding:19px;max-height:calc(100dvh - 24px);border-radius:18px}.editor-heading{top:-19px;margin-bottom:12px;padding-top:5px}.editor-heading h2{font-size:21px}.editor-grid{grid-template-columns:1fr;gap:20px}.message-editor{border-left:0;border-top:1px dashed var(--line);padding:13px 0 0}.message-heading{padding:0;text-align:left}.message-heading>span,.message-heading p{display:none}.message-heading h3{font-size:18px;margin:8px 0 14px}.avatar-box{margin-bottom:14px}.style-card canvas{width:46px;height:47px}.style-card{font-size:9px}.style-grid{gap:6px}.wardrobe-heading{margin-top:14px}.garden-actions{padding:16px max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}.write-button{padding:11px 16px;font-size:11px}.admin-actions{flex-direction:column}#allMessages{grid-template-columns:1fr}input,textarea{font-size:16px}textarea{height:115px}.selected-note{top:max(16px,env(safe-area-inset-top));font-size:12px}.admin-dialog{padding:20px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+#colorOptions,#shirtOptions{display:grid;grid-template-columns:45px repeat(5,minmax(0,1fr));gap:7px 5px;align-items:center}#colorOptions .label,#shirtOptions .label{grid-row:1 / 3;align-self:start;padding-top:8px}.swatch{width:29px;height:29px;justify-self:center}#colorOptions .swatch:nth-of-type(6),#shirtOptions .swatch:nth-of-type(6){grid-column:2}.selected-note:after{content:'';position:absolute;bottom:-8px;left:calc(50% - 7px);width:14px;height:10px;background:#fffef1;clip-path:polygon(0 0,100% 0,50% 100%)}
+</style></head>
+<body>
+<main class="garden-world" aria-label="우리의 작은 결혼식 방명록">
+<h1 class="sr-only">우리의 작은 결혼식 — 픽셀 정원 방명록 · 결혼 날짜 2026.10.24</h1>
+<canvas id="garden" width="960" height="780" aria-label="Happy Wedding! · 2026.10.24 웨딩 플래카드와 꽃 아치 아래 신랑 정근과 신부 예나, 정원을 산책하는 하객들, 작은 토끼와 다람쥐와 새. 하객을 누르면 메시지를 볼 수 있습니다. 정원 메뉴에서는 모든 방명록을 읽을 수 있습니다."></canvas>
+<div class="selected-note" id="selectedNote"><b></b><span></span><button aria-label="말풍선 닫기" type="button">×</button></div>
+<nav class="garden-actions" aria-label="방명록 메뉴"><button id="openMenu" class="quiet-menu" type="button" aria-label="정원 메뉴 열기" aria-haspopup="dialog">···</button><button id="openWriter" class="write-button" type="button" aria-haspopup="dialog"><span aria-hidden="true">✎</span> 방명록 쓰기</button></nav>
+</main>
+<dialog id="editorDialog" class="editor-dialog panel" aria-labelledby="editorTitle">
+<div class="editor-heading"><div><div class="panel-kicker">A LITTLE NOTE OF LOVE</div><h2 id="editorTitle">나의 작은 축하를 남겨요</h2></div><button type="button" id="closeEditor" class="dialog-close" aria-label="방명록 작성 창 닫기">×</button></div>
+<div class="editor-grid"><section class="avatar-editor" aria-label="미니미 꾸미기"><div class="avatar-box"><canvas id="avatar" width="126" height="126" aria-label="선택한 아바타 미리보기"></canvas><div class="avatar-caption">오늘의 나, 꽤 귀엽죠?</div><button type="button" class="random" id="randomize" aria-label="아바타 무작위 만들기">⚄</button></div><div id="editBanner" class="edit-banner" hidden></div><div class="customizer"><div class="option-row" id="skinOptions"><span class="label">피부색</span></div><div class="option-row" id="colorOptions"><span class="label">머리색</span></div><div class="option-row" id="shirtOptions"><span class="label">옷 색</span></div><div class="wardrobe-heading"><span>머리스타일</span><small>10 STYLES</small></div><div class="style-grid" id="hairOptions" role="group" aria-label="머리스타일 10종"></div><div class="wardrobe-heading"><span>오늘의 의상</span><small>10 OUTFITS</small></div><div class="style-grid" id="outfitOptions" role="group" aria-label="의상 10종"></div><div class="wardrobe-heading"><span>작은 액세서리</span><small>하나씩 선택</small></div><div class="style-grid" id="accessoryOptions" role="group" aria-label="액세서리 선택"></div><p class="style-tip">같은 의상도, 색을 바꾸면 다른 매력!</p></div></section><section class="message-editor"><div class="message-heading"><span aria-hidden="true">✿</span><h3>두 분에게 전하는 마음</h3><p>작은 미니미와 함께<br>따뜻한 한마디를 보내 주세요.</p></div><form id="guestForm"><label class="input-label" for="guestName">이름 또는 별명 <small>최대 10자</small></label><input id="guestName" required placeholder="두 분이 알아볼 수 있는 이름" autocomplete="nickname"><label class="input-label" for="guestMessage">두 분에게 전하는 한마디 <small><span id="charCount">0</span> / 30</small></label><textarea id="guestMessage" required placeholder="두 분의 모든 계절이 행복으로 가득하길 ♡"></textarea><button class="submit" type="submit"><span>♡</span> 축하하는 마음 남기기 <span>↗</span></button><button id="cancelEdit" type="button" class="secondary cancel-edit" hidden>수정 취소</button><p id="editorStatus" class="editor-status" role="status"></p><p class="privacy">미니미가 정원에 도착하면, 말풍선으로 마음을 전해요.<br>체험 페이지 · 작성한 글은 이 브라우저에 저장됩니다.</p></form></section></div></dialog>
+<dialog id="gardenMenu" class="small-dialog" aria-labelledby="menuTitle"><div class="dialog-heading"><h2 id="menuTitle">작은 정원</h2><button type="button" id="closeMenu" class="dialog-close" aria-label="정원 메뉴 닫기">×</button></div><p id="guestCount" class="menu-description"></p><button id="openNotes" class="menu-item" type="button">♡ &nbsp; 도착한 방명록 읽기</button><button id="motionToggle" class="menu-item" aria-pressed="false" type="button">Ⅱ &nbsp; 움직임 쉬어가기</button><button id="openAdmin" class="menu-item" type="button">⚙ &nbsp; 관리자 모드</button></dialog>
+<dialog id="notesDialog" class="notes-dialog" aria-labelledby="notesTitle"><div class="dialog-heading"><h2 id="notesTitle">도착한 마음들</h2><button id="closeNotes" class="dialog-close" type="button" aria-label="방명록 목록 닫기">×</button></div><p id="noteCount" class="menu-description"></p><div id="messageList" hidden></div><div id="allMessages"></div></dialog>
+<div class="toast" id="toast" role="status"></div>
+<dialog id="adminDialog" class="admin-dialog" aria-labelledby="adminTitle"><div class="dialog-heading"><h2 id="adminTitle">작은 정원 관리하기</h2><button type="button" class="dialog-close" id="closeAdmin" aria-label="관리자 창 닫기">×</button></div><p class="admin-description" id="adminDescription"></p><form id="adminLogin"><label class="input-label" for="adminPassword">관리자 비밀번호</label><input type="password" id="adminPassword" autocomplete="current-password" placeholder="관리자 비밀번호를 입력해 주세요" required><button type="submit" class="submit">관리자 로그인</button></form><p class="admin-error" id="adminError" role="status"></p><section id="adminContent" hidden><div class="admin-toolbar"><span id="adminCount"></span><button type="button" class="secondary" id="adminLogout">관리자 모드 종료</button></div><div id="deleteConfirm" class="delete-confirm" hidden><p id="deletePrompt"></p><button type="button" class="danger" id="confirmDelete">삭제하기</button><button type="button" class="secondary" id="cancelDelete">취소</button></div><div id="adminList"></div></section></dialog>
+<script>
+'use strict';
+const $=s=>document.querySelector(s), canvas=$('#garden'),ctx=canvas.getContext('2d'),av=$('#avatar').getContext('2d');
+const skins=['#f3cfad','#e8b68b','#be8966','#855a43'], hairs=['#39362f','#957360','#ad7956','#a486a4','#c18caa','#a393c2','#7f9fc0','#598e99','#bd8b79','#7d879e'],shirts=['#8397b7','#568f99','#90b3d6','#d89bab','#ad9acb','#d99b86','#bd837b','#78afb8','#bb88a5','#949ec9'];
+const hairNames=['단정 숏컷','몽글 곱슬','긴 생머리','동글 단발','가르마','포니테일','양갈래','올림머리','픽시컷','긴 웨이브'];
+const outfitNames=['티셔츠','줄무늬 티','후드티','가디건','정장','멜빵바지','원피스','플리츠 룩','한복','니트 조끼'];
+const accessoryNames=['없음','둥근 안경','네모 안경','선글라스','분홍 리본','꽃 머리핀','진주 머리띠','베레모','버킷햇','작은 왕관'];
+let chosen={skin:0,hair:0,color:0,shirt:1,outfit:0,accessory:0},paused=matchMedia('(prefers-reduced-motion: reduce)').matches,guests=[],selected=null,frame=0,lastTime=0, toastTimer;
+let seed=72;function rnd(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}function rect(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),w,h)}
+// One design cell is two canvas units: fewer, larger pixels and a generous head.
+function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
+ c.save();c.imageSmoothingEnabled=false;c.translate(Math.round(x),Math.round(y));const unit=scale*2;
+ const p=(x,y,w,h,col)=>{const left=Math.round(x*unit),top=Math.round(y*unit),right=Math.round((x+w)*unit),bottom=Math.round((y+h)*unit);c.fillStyle=col;c.fillRect(left,top,right-left,bottom-top)},skin=skins[a.skin],hair=hairs[a.color],cloth=shirts[a.shirt],ink='#34372f',cream='#fff3d7';
+ const hs=role==='groom'?4:role==='bride'?2:a.hair, outfit=a.outfit||0;
+ p(-4,7,8,1,'#53614025');c.translate(0,paused?0:Math.round(Math.sin(t*2.2)*.14*unit));
+ const step=walking&&!paused?Math.round(Math.sin(t*7))*.45:0;
+ // Hair silhouettes behind the face.
+ if([2,9].includes(hs)){p(-5,-9,10,11,hair);p(-6,-6,1,8,hair);p(5,-6,1,8,hair)}
+ if(hs===3){p(-6,-8,12,7,hair);p(-5,-2,10,1,hair)}
+ if(hs===5){p(4,-9,3,3,hair);p(5,-7,3,7,hair);p(5,-6,1,1,'#d89482')}
+ if(hs===6){p(-7,-8,3,7,hair);p(4,-8,3,7,hair);p(-6,-7,1,1,'#d89482');p(5,-7,1,1,'#d89482')}
+ if(hs===7){p(1,-13,3,3,hair);p(0,-12,5,2,hair);p(1,-10,3,1,'#c4a372')}
+ if(hs===9){p(-7,-5,2,3,hair);p(-6,-2,2,5,hair);p(5,-3,2,4,hair)}
+ // Small feet, body and blocky sleeves.
+ let pants=role==='groom'?'#cfc7b6':'#44545a';
+ p(-2,2,2,4+step,pants);p(1,2,2,4-step,pants);p(-2,6+step,2,1,ink);p(1,6-step,2,1,ink);
+ p(-3,-2,6,5,role==='groom'?'#e7e0d2':role==='bride'?'#fff9e7':cloth);
+ p(-4,-1,1,3,cloth);p(3,-1,1,3,cloth);p(-4,2,1,1,skin);p(3,2,1,1,skin);
+ if(!role){switch(outfit){
+ case 0:p(-1,-2,2,1,cream);p(1,0,1,1,cream);break;
+ case 1:for(let yy=-1;yy<3;yy+=2)p(-3,yy,6,1,cream);break;
+ case 2:p(-4,-2,8,2,cloth);p(-2,-2,4,1,cream);p(-2,1,4,1,'#00000024');p(-1,-1,1,1,cream);p(1,-1,1,1,cream);break;
+ case 3:p(-1,-2,2,5,cream);p(0,-1,1,1,'#ac925f');p(0,1,1,1,'#ac925f');break;
+ case 4:p(-1,-2,2,5,cream);p(0,-1,1,3,'#6d584c');p(-2,-1,1,1,cream);p(2,-1,1,1,cream);break;
+ case 5:p(-3,-2,6,2,cream);p(-2,-2,1,3,cloth);p(1,-2,1,3,cloth);p(-3,1,6,3,cloth);p(-2,3,2,3,cloth);p(1,3,2,3,cloth);p(-1,1,2,1,'#ffffff50');break;
+ case 6:p(-4,2,8,3,cloth);p(-5,4,10,1,cloth);p(-3,1,6,1,cream);p(1,3,1,1,cream);break;
+ case 7:p(-3,-2,6,3,cream);p(-4,1,8,4,cloth);p(-2,2,1,3,'#00000020');p(1,2,1,3,'#00000020');break;
+ case 8:p(-3,-2,6,3,cream);p(-4,1,8,3,cloth);p(-5,3,10,2,cloth);p(-1,-2,1,2,cloth);p(0,-1,2,1,cloth);p(1,0,1,2,cloth);break;
+ case 9:p(-4,-1,1,3,cream);p(3,-1,1,3,cream);p(-1,-2,2,1,cream);p(0,-1,1,1,cream);p(-3,2,6,1,'#00000022');break;
+ }}
+ if(role==='groom'){p(-4,-1,1,3,'#e7e0d2');p(3,-1,1,3,'#e7e0d2');p(-1,-2,2,5,'#fff9ed');p(0,-1,1,3,'#b9aa90');p(-2,-1,1,2,'#f7f0df');p(2,-1,1,2,'#f7f0df')}
+ if(role==='bride'){p(-4,-1,1,3,skin);p(3,-1,1,3,skin);p(-4,2,8,2,'#fff9e7');p(-5,4,10,2,'#fff9e7');p(-4,6,8,1,'#dedec9');p(2,3,1,3,'#eae9d4')}
+ p(-1,-3,2,1,skin);p(-5,-9,10,6,skin);p(-4,-3,8,1,skin);p(-6,-7,1,2,skin);p(5,-7,1,2,skin);
+ // Ten deliberately different hair outlines and fringes.
+ p(-4,-11,8,2,hair);p(-5,-10,10,1,hair);
+ switch(hs){
+ case 0:p(-5,-9,10,1,hair);p(-5,-8,1,3,hair);p(4,-8,1,2,hair);p(-3,-8,3,1,hair);break;
+ case 1:p(-5,-11,2,2,hair);p(-2,-12,2,3,hair);p(2,-12,2,3,hair);p(-6,-9,2,3,hair);p(4,-9,2,3,hair);p(-3,-9,2,2,hair);p(1,-9,2,2,hair);break;
+ case 2:p(-5,-9,2,7,hair);p(4,-9,1,7,hair);p(-3,-9,3,1,hair);p(0,-8,3,1,hair);break;
+ case 3:p(-5,-9,10,1,hair);p(-5,-8,1,6,hair);p(4,-8,1,6,hair);p(-3,-8,6,1,hair);break;
+ case 4:p(-1,-10,1,2,skin);p(-5,-9,3,2,hair);p(-4,-7,1,1,hair);p(0,-9,5,1,hair);p(3,-8,2,1,hair);break;
+ case 5:p(-5,-9,3,2,hair);p(-2,-9,3,1,hair);p(4,-9,1,3,hair);break;
+ case 6:p(-5,-9,10,1,hair);p(-5,-8,1,3,hair);p(4,-8,1,3,hair);p(-2,-8,2,1,hair);break;
+ case 7:p(-5,-9,2,2,hair);p(3,-9,2,2,hair);p(-3,-9,3,1,hair);break;
+ case 8:p(-3,-12,5,1,hair);p(-5,-9,8,1,hair);p(-5,-8,4,1,hair);p(-5,-7,2,1,hair);break;
+ case 9:p(-5,-9,3,2,hair);p(-3,-8,3,1,hair);p(4,-8,1,4,hair);p(-5,-6,1,4,hair);break;
+ }
+ const blink=!paused&&Math.sin(t*.9+(a.skin||0)*2)>.996;
+ p(-3,-6,1,blink?1:2,ink);p(2,-6,1,blink?1:2,ink);p(-4,-3,1,1,'#dc9e90');p(3,-3,1,1,'#dc9e90');
+ if(role==='bride'){p(-4,-10,1,1,cream);p(0,-11,1,1,'#f3c4b2');p(3,-10,1,1,cream);p(-2,1,4,2,'#7b9861');p(-2,0,2,1,'#f2c8b6');p(0,0,2,1,cream);p(0,2,1,2,'#adb080')}
+ if(!role){switch(a.accessory||0){
+ case 1:for(const xx of [-4,1]){p(xx,-7,3,1,'#725e55');p(xx,-4,3,1,'#725e55');p(xx-1,-6,1,2,'#725e55');p(xx+3,-6,1,2,'#725e55')}p(-1,-6,2,1,'#725e55');break;
+ case 2:for(const xx of [-5,1]){p(xx,-7,4,1,'#575e69');p(xx,-4,4,1,'#575e69');p(xx,-6,1,2,'#575e69');p(xx+3,-6,1,2,'#575e69')}p(-1,-6,2,1,'#575e69');break;
+ case 3:p(-5,-7,4,3,'#414654');p(1,-7,4,3,'#414654');p(-1,-6,2,1,'#414654');p(-4,-7,2,1,'#8195a4');p(2,-7,2,1,'#8195a4');break;
+ case 4:p(1,-11,2,3,'#d995ab');p(4,-11,2,3,'#d995ab');p(3,-10,1,1,'#f5c7d4');break;
+ case 5:p(3,-10,1,3,'#fff3d7');p(2,-9,3,1,'#fff3d7');p(3,-9,1,1,'#d7a45b');break;
+ case 6:p(-4,-10,8,1,'#dab9c4');for(const xx of [-4,-2,0,2,4])p(xx,-10,1,1,'#fff2dc');break;
+ case 7:p(-4,-12,8,3,'#b88b9f');p(-5,-11,10,2,'#b88b9f');p(-4,-9,8,1,'#91677d');p(1,-13,1,1,'#91677d');break;
+ case 8:p(-4,-12,8,3,'#849fb8');p(-6,-9,12,2,'#849fb8');p(-4,-10,8,1,'#c3d3db');break;
+ case 9:p(-4,-12,1,3,'#dbb86b');p(0,-13,1,4,'#dbb86b');p(4,-12,1,3,'#dbb86b');p(-4,-10,9,2,'#dbb86b');p(0,-10,1,1,'#da91a7');break;
+ }}
+ c.restore();
+}
+const bg=document.createElement('canvas');bg.width=960;bg.height=780;const b=bg.getContext('2d');
+let sceneLayout={width:960,height:780,center:480,left:205,right:760,top:456,bottom:707};
+function tile(c,x,y,w,h,color){rect(c,Math.round(x/4)*4,Math.round(y/4)*4,Math.max(4,Math.round(w/4)*4),Math.max(4,Math.round(h/4)*4),color)}
+let gardenFlowers=[];
+const flowerColors=['#fffaf0','#f0afc1','#f6d571','#cdb8dc'];
+function flower(c,x,y,size=4,color='#fff8da',stem=true,shape=0){
+ if(stem){gardenFlowers.push({x,y,size,color,shape,phase:x*.017+y*.012});return}
+ flowerHead(c,x,y,size,color,0);
+}
+function flowerHead(c,x,y,size,color,shape){
+ const p=(dx,dy,w,h,col)=>rect(c,x+dx*size,y+dy*size,w*size,h*size,col);
+ if(shape===0){p(-1,-3,3,2,color);p(-3,-1,2,3,color);p(2,-1,2,3,color);p(-1,2,3,2,color);p(-1,-1,3,3,color);p(0,0,1,1,'#d9af60')}
+ if(shape===1){p(-2,-3,1,3,color);p(0,-3,1,3,color);p(2,-3,1,3,color);p(-2,-1,5,3,color);p(-1,2,3,1,color);p(-1,0,1,2,'#ffffff30')}
+ if(shape===2){p(-1,-3,3,1,color);p(-2,-2,5,3,color);p(-3,1,7,1,color);p(-2,2,1,1,color);p(0,2,1,1,color);p(2,2,1,1,color);p(0,0,1,1,'#f6d99c')}
+ if(shape===3){p(0,-3,1,2,color);p(-3,0,2,1,color);p(2,0,2,1,color);p(0,2,1,2,color);p(-2,-2,2,2,color);p(1,-2,2,2,color);p(-2,1,2,2,color);p(1,1,2,2,color);p(-1,-1,3,3,color);p(0,0,1,1,'#e8bd73')}
+}
+function drawFlowers(t){for(const f of gardenFlowers){const s=f.size,wind=Math.round(Math.sin(t*1.15+f.phase)*2+Math.sin(t*.57+f.phase)*1),half=Math.round(wind/2);
+ // Anchor the roots; overlap the bending stem segments so no pixels separate.
+ rect(ctx,f.x,f.y+4*s,s,2*s,'#88a469');rect(ctx,f.x+half,f.y+2*s,s,3*s,'#88a469');rect(ctx,f.x+wind,f.y+s,s,2*s,'#88a469');rect(ctx,f.x-2*s,f.y+4*s,2*s,s,'#8caa6b');rect(ctx,f.x+s+half,f.y+3*s,2*s,s,'#8caa6b');flowerHead(ctx,f.x+wind,f.y,s,f.color,f.shape)
+}}
+function heartState(t,i){const phase=((t+i*1.65)%5)/5;return{phase,x:sceneLayout.center+(i%2?-1:1)*(104+i*8)+Math.round(Math.sin(t*.8+i)*4),y:Math.round(234-Math.min(phase,.68)*104)}}
+function drawHearts(t){for(let i=0;i<3;i++){const h=heartState(t,i),color=['#dfa0b0','#e6b19b','#c9a3cc'][i];if(h.phase>.87)continue;
+ if(h.phase<.68){const size=h.phase<.1?1:2,pattern=['0110110','1111111','1111111','0111110','0011100','0001000'];for(let yy=0;yy<pattern.length;yy++)for(let xx=0;xx<7;xx++)if(pattern[yy][xx]==='1')rect(ctx,h.x+(xx-3)*size,h.y+yy*size,size,size,color)}
+ else{const r=4+(h.phase-.68)*65;for(let n=0;n<6;n++){const angle=n*Math.PI/3;rect(ctx,h.x+Math.cos(angle)*r,h.y+5+Math.sin(angle)*r,2,2,color)}}
+}}
+function bush(x,y,w=64){tile(b,x+8,y+24,w-16,12,'#a3bd80');tile(b,x,y+8,w,24,'#a3bd80');tile(b,x+12,y,w-24,32,'#adc78a');tile(b,x+20,y+4,12,8,'#b8d197')}
+function tree(x,y){
+ tile(b,x-12,y+64,24,72,'#b49b71');tile(b,x-4,y+72,8,64,'#cbb187');
+ tile(b,x-64,y+24,128,56,'#9dbb79');tile(b,x-48,y+8,96,88,'#9dbb79');tile(b,x-28,y,56,100,'#9dbb79');
+ tile(b,x-52,y+16,104,52,'#aecb8d');tile(b,x-32,y+4,64,80,'#aecb8d');tile(b,x-28,y+16,24,12,'#bed799');
+ flower(b,x-32,y+40,4,'#f9dece',false);flower(b,x+24,y+64,4,'#fff5d4',false);flower(b,x+8,y+12,4,'#f9dece',false);
+}
+function planter(x,y){tile(b,x-28,y+20,56,20,'#d0b891');tile(b,x-32,y+16,64,8,'#e0c9a3');bush(x-32,y-8,64);flower(b,x-20,y-4,4,'#f3c3b1');flower(b,x+16,y-12,4,'#fff8dc');flower(b,x+4,y+4,4,'#f8e1a5')}
+
+const signGlyphs={
+ 'H':['101','101','111','101','101'],'W':['101','101','111','111','101'],'!':['010','010','010','000','010'],
+ 'a':['000','011','101','101','011'],'p':['000','110','101','110','100','100'],'y':['000','101','101','011','001','110'],'e':['000','111','110','100','111'],'d':['001','001','111','101','111'],'i':['010','000','010','010','010'],'n':['000','110','101','101','101'],'g':['000','111','101','111','001','110'],
+ '0':['111','101','101','101','111'],'1':['010','110','010','010','111'],'2':['111','001','111','100','111'],'3':['111','001','111','001','111'],'4':['101','101','111','001','001'],'5':['111','100','111','001','111'],'6':['111','100','111','101','111'],'7':['111','001','010','010','010'],'8':['111','101','111','101','111'],'9':['111','101','111','001','111'],'.':['000','000','000','000','010'],
+ 'J':['111','001','001','101','111'],'U':['101','101','101','101','111'],'S':['111','100','111','001','111'],'T':['111','010','010','010','010'],'M':['101','111','111','101','101'],'A':['010','101','111','101','101'],'R':['110','101','110','101','101'],'I':['111','010','010','010','111'],'E':['111','100','110','100','111'],'D':['110','101','101','101','110'],' ':['000','000','000','000','000']
+};
+function pixelLettering(c,text,cx,y,size,color){const start=Math.round(cx-(text.length*4-1)*size/2);for(let i=0;i<text.length;i++){const glyph=signGlyphs[text[i]];if(!glyph)continue;glyph.forEach((row,j)=>Array.from(row).forEach((bit,k)=>{if(bit==='1')rect(c,start+(i*4+k)*size,y+j*size,size,size,color)}))}}
+function weddingBanner(C){
+ // Preserve the heart-shaped upper lobes; use a flat base with soft pixel corners.
+ const topBands=[[-88,-44,44,88],[-104,-28,28,104],[-112,-16,16,112],[-120,-8,8,120],[-124,-4,4,124]];
+ for(const [offset,color]of [[2,'#e4d4b4'],[0,'#fff5dd']]){
+  topBands.forEach((runs,row)=>{for(let i=0;i<runs.length;i+=2)rect(b,C+runs[i],58+row*4+offset,runs[i+1]-runs[i],4,color)});
+  rect(b,C-124,78+offset,248,48,color);
+  rect(b,C-122,126+offset,244,4,color);
+  rect(b,C-118,130+offset,236,4,color);
+  rect(b,C-112,134+offset,224,4,color);
+ }
+ pixelLettering(b,'Happy Wedding!',C,84,3,'#a77c6e');
+ pixelLettering(b,'2026.10.24',C,112,3,'#768563');
+}
+
+function background(){
+ const {width:W,height:H,center:C}=sceneLayout;gardenFlowers=[];
+ tile(b,0,0,W,H,'#b9d39b');
+ // Broad, flat color blocks instead of noisy grass texture.
+ tile(b,0,0,W,24,'#afca90');tile(b,0,H-28,W,28,'#afca90');
+ for(let row=0;row<Math.ceil(H/96);row++)for(let col=0;col<Math.ceil(W/112);col++){
+  const x=24+col*112+(row%2)*36,y=36+row*96;
+  if(Math.abs(x-C)<106&&y>290)continue;
+  tile(b,x,y,8,4,'#abc88a');tile(b,x+4,y-4,4,8,'#abc88a');
+ }
+ // Soft cream aisle, with a stepped edge and widely spaced tiles.
+ tile(b,C-64,276,128,H-276,'#ece3bc');tile(b,C-76,348,152,H-348,'#ece3bc');
+ for(let y=368;y<H;y+=96){tile(b,C-40,y,56,4,'#e0d4a9');tile(b,C+28,y+40,20,4,'#e0d4a9')}
+ // Layer flowering trees behind the platform and arch, leaving the sign legible.
+ for(const side of [-1,1]){tree(C+side*196,56);tree(C+side*110,-42);tree(C+side*34,-64);bush(C+side*180-36,172,72)}
+ tile(b,C-160,280,320,20,'#cbbb96');tile(b,C-160,272,320,12,'#f9edca');tile(b,C-144,256,288,16,'#dfd0aa');tile(b,C-136,208,272,48,'#f6ebcc');tile(b,C-136,252,272,8,'#eadcb6');
+ // Chunky wedding arch: cream posts, a green garland, and large daisies.
+ tile(b,C-132,88,12,156,'#fff6da');tile(b,C+120,88,12,156,'#fff6da');
+ tile(b,C-120,68,240,12,'#fff6da');tile(b,C-100,52,200,12,'#fff6da');
+ for(let side of [-1,1]){const x=C+side*132;bush(x-16,92,32);bush(x-16,156,32);bush(x-16,208,32);flower(b,x,108,4,'#fff8df',false);flower(b,x,158,4,'#f2c3b3',false);flower(b,x,218,4,'#fff8df',false)}
+ for(let i=-3;i<=3;i++){const x=C+i*36,y=60+(Math.abs(i)===3?16:Math.abs(i)===2?4:0);tile(b,x-16,y-12,36,24,'#95b37a');flower(b,x,y,4,i%2?'#f4cbbb':'#fff8de',false)}
+ weddingBanner(C);
+ planter(C-182,252);planter(C+182,252);
+ // A few toy-like trees, repeated flower beds and pastel bouquets frame the guests.
+ tree(48,16);tree(W-48,16);
+ if(W>900){tree(110,H-210);tree(W-110,H-210)}
+ // Matched garlands turn the platform corners and meet the aisle borders.
+ const stageFloralPlan=[[196,242,0,0],[183,264,1,1],[174,286,2,0],[149,303,0,3],[128,320,1,0]];
+ for(const side of [-1,1])for(const [distance,y,color,shape]of stageFloralPlan){
+  const x=C+side*distance;bush(x-20,y+7,40);flower(b,x,y,4,flowerColors[color],true,shape);
+  const bloom=gardenFlowers[gardenFlowers.length-1];bloom.phase=distance*.017+y*.012;
+ }
+ meadow(W,H,C);
+}
+// A repeatable garden composition: independent clusters, not mirrored rows.
+function meadow(W,H,C){
+ let state=17024;const random=()=>{state=(state*16807)%2147483647;return(state-1)/2147483646};
+ const palette=[0,0,0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,3];
+ for(let i=palette.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[palette[i],palette[j]]=[palette[j],palette[i]]}
+ const placed=[];let index=0;
+ function plant(side,d,y){const size=random()<.35?3:4,x=C+side*d;if(y<326||y>H-58||placed.some(p=>Math.hypot(p.x-x,p.y-y)<22))return;placed.push({x,y});flower(b,x,y,size,flowerColors[palette[index++%20]],true,Math.floor(random()*4))}
+ // Two loose floral borders follow the aisle; no flowers or leaves enter its center.
+ for(const side of [-1,1]){
+  for(let y=344+(side<0?0:12);y<H-78;y+=68+random()*20){
+   const center=y+(random()-.5)*12;
+   if(random()<.4)bush(C+side*144-24,center+12,48);
+   plant(side,104+random()*8,center);
+   plant(side,140+random()*16,center-12+random()*20);
+   if(random()<.65)plant(side,123+random()*20,center+29);
+  }
+ }
+}
+function resizeScene(){
+ const before=sceneLayout,scale=Math.min(innerWidth/600,innerHeight/780,1.4),W=Math.ceil(innerWidth/scale/4)*4,H=Math.ceil(innerHeight/scale/4)*4;
+ const span=Math.min(560,W-168);sceneLayout={width:W,height:H,center:W/2,left:W/2-span/2,right:W/2+span/2,top:456,bottom:H-112};
+ canvas.width=bg.width=W;canvas.height=bg.height=H;ctx.imageSmoothingEnabled=false;b.imageSmoothingEnabled=false;
+ for(const g of guests){g.x=sceneLayout.left+(g.x-before.left)/(before.right-before.left)*span;g.targetX=Math.max(sceneLayout.left,Math.min(sceneLayout.right,g.x));const ratio=Math.max(0,Math.min(1,(g.y-before.top)/(before.bottom-before.top)));g.y=sceneLayout.top+ratio*(sceneLayout.bottom-sceneLayout.top);g.targetY=g.y}
+ background();
+}
+let examples=[{name:'지은',message:'둘이 함께할 모든 날을 응원해 ♡',skin:0,hair:2,color:1,shirt:3},{name:'민수',message:'결혼 축하해! 행복하게 잘 살아 🌷',skin:1,hair:0,color:0,shirt:2},{name:'수진',message:'오늘 세상에서 제일 예쁜 두 사람!',skin:0,hair:2,color:0,shirt:4},{name:'도윤',message:'웃음 가득한 날들만 이어지길!',skin:2,hair:1,color:1,shirt:1},{name:'유나',message:'오래오래 서로의 가장 좋은 친구로 ♡',skin:1,hair:2,color:2,shirt:0},{name:'현우',message:'두 사람의 새로운 시작을 축하해!',skin:0,hair:1,color:0,shirt:0}];const key='little-wedding-guests-v1';let saved=[],seeded=false;try{const stored=JSON.parse(localStorage.getItem(key)||'[]');seeded=stored?.version===2;saved=Array.isArray(stored)?stored:stored.guests;if(!Array.isArray(saved))throw Error('invalid storage');saved=saved.filter(g=>typeof g.name==='string'&&typeof g.message==='string'&&[g.skin,g.color,g.shirt,g.hair].every(Number.isInteger)&&g.skin>=0&&g.skin<4&&g.color>=0&&g.color<hairs.length&&g.shirt>=0&&g.shirt<shirts.length&&g.hair>=0&&g.hair<10).map(g=>({...g,id:g.id||crypto.randomUUID(),outfit:Number.isInteger(g.outfit)&&g.outfit>=0&&g.outfit<10?g.outfit:0,accessory:Number.isInteger(g.accessory)&&g.accessory>=0&&g.accessory<10?g.accessory:0,name:Array.from(g.name).slice(0,10).join(''),message:Array.from(g.message).slice(0,30).join('')}))}catch(e){saved=[];seeded=false}
+function storeGuests(items){localStorage.setItem(key,JSON.stringify({version:2,guests:items}))}
+examples=examples.map((g,i)=>({...g,id:'example-'+i,example:true,outfit:[6,4,7,2,8,5][i],hair:[9,4,3,1,7,8][i]}));
+if(!seeded)saved=[...examples.filter(g=>!saved.some(p=>p.id===g.id)),...saved];
+try{storeGuests(saved)}catch(e){}
+function addGuest(g,i){const L=sceneLayout,cols=L.width<760?3:4;guests.push({...g,x:L.left+(i%cols)*(L.right-L.left)/(cols-1),y:L.top+8+Math.floor(i%(cols*3)/cols)*(L.bottom-L.top-16)/2,targetX:L.left+Math.random()*(L.right-L.left),targetY:L.top+Math.random()*(L.bottom-L.top),wait:Math.random()*4,phase:Math.random()*15,newUntil:0})}saved.forEach(addGuest);
+function roundedBubbleRect(c,x,y,w,h,r,color){
+ x=Math.round(x);y=Math.round(y);w=Math.ceil(w);h=Math.ceil(h);r=Math.min(r,Math.floor(h/2));
+ for(let row=0;row<h;row++){const d=row<r?r-row-.5:row>=h-r?row-(h-r)+.5:0;const inset=d?Math.ceil(r-Math.sqrt(r*r-d*d)):0;rect(c,x+inset,y+row,w-2*inset,1,color)}
+}
+function bubble(text,x,y){ctx.save();ctx.globalAlpha=1;ctx.font='14px "Noto Sans KR",sans-serif';let letters=Array.from(text),lines=[];for(let i=0;i<letters.length;i+=14)lines.push(letters.slice(i,i+14).join(''));let w=Math.max(...lines.map(l=>ctx.measureText(l).width))+24,h=lines.length*22+16;x=Math.max(w/2+8,Math.min(canvas.width-8-w/2,x));roundedBubbleRect(ctx,x-w/2,y-h,w,h,13,'#fffef0');rect(ctx,x-4,y,9,5,'#fffef0');rect(ctx,x-2,y+5,4,3,'#fffef0');ctx.fillStyle='#526045';ctx.textAlign='center';lines.forEach((l,i)=>ctx.fillText(l,x,y-h+24+i*22));ctx.restore()}
+// Three decorative animals use the same paused animation clock as the guests.
+// Their small paths stay at the garden edges, below the wedding platform.
+function animalPosition(kind,t){
+ const L=sceneLayout,route={rabbit:{side:-1,phase:2,speed:.034},squirrel:{side:1,phase:.7,speed:.031},bird:{side:-1,phase:4.3,speed:.038}}[kind];
+ const wave=t*route.speed+route.phase,top=258,bottom=L.height-140;
+ const y=top+(1-Math.cos(wave))*.5*(bottom-top);
+ // Keep even the enlarged animal silhouette outside the central platform.
+ const distance=Math.min(L.width/2-58,220+Math.sin(wave*1.7+route.phase)*18);
+ return{x:Math.round(L.center+route.side*distance),y:Math.round(y),flip:route.side*Math.cos(wave*1.7+route.phase)<0,hop:Math.max(0,Math.round(Math.sin(t*(kind==='bird'?3.2:2.1)+route.phase)*3))};
+}
+function animalSprite(c,kind,x,y,flip=false,hop=0){
+ c.save();c.translate(Math.round(x),Math.round(y));c.scale(flip?-1:1,1);c.imageSmoothingEnabled=false;
+ const p=(x,y,w,h,col)=>{const left=Math.round(x*4.5),top=Math.round(y*4.5);rect(c,left,top,Math.round((x+w)*4.5)-left,Math.round((y+h)*4.5)-top,col)},eye='#48413e';
+ p(-5,2,10,1,'#63795225');c.translate(0,-hop);
+ if(kind==='rabbit'){
+  p(-5,-4,9,6,'#c3b6ae');p(-4,-5,7,6,'#fff5e7');p(1,-8,5,6,'#fff5e7');p(1,-13,2,6,'#fff5e7');p(4,-12,2,5,'#fff5e7');p(2,-12,1,4,'#dba7a5');p(5,-11,1,3,'#dba7a5');p(-6,-3,2,2,'#fffaf0');p(-3,1,3,1,'#e6d4c4');p(3,1,3,1,'#e6d4c4');p(4,-6,1,1,eye);p(6,-4,1,1,'#c99793');
+ }else if(kind==='squirrel'){
+  p(-7,-8,4,8,'#9a6c50');p(-8,-7,2,5,'#9a6c50');p(-6,-9,4,2,'#bb8860');p(-5,-7,2,5,'#d2a175');p(-3,-4,7,5,'#b88158');p(-2,-3,4,4,'#dfb88b');p(1,-8,5,5,'#b88158');p(1,-10,2,3,'#a67453');p(4,-9,2,2,'#a67453');p(1,-7,3,1,'#e6c49a');p(4,-6,1,1,eye);p(6,-4,1,1,eye);p(-2,1,3,1,'#8b644a');p(3,1,3,1,'#8b644a');
+ }else{
+  p(-4,-4,7,5,'#7793b5');p(-3,-2,5,3,'#c3d8e1');p(1,-7,4,5,'#7793b5');p(-6,-3,3,2,'#647fa4');p(-2,-4,4,2,'#9db9cd');p(3,-5,1,1,eye);p(5,-4,2,1,'#d09b65');p(-1,1,1,2,'#a58d68');p(2,1,1,2,'#a58d68');
+ }
+ c.restore();
+}
+function drawAnimals(t){for(const kind of ['rabbit','squirrel','bird']){const p=animalPosition(kind,t);animalSprite(ctx,kind,p.x,p.y,p.flip,p.hop)}}
+// Sparse petals are painted last in the scene, in front of people and speech bubbles.
+// They share the scene clock, so pause and reduced-motion preferences also stop them.
+function petalPositions(t){
+ const W=canvas.width,H=canvas.height,count=4*Math.max(8,Math.min(16,Math.round(W*H/85000))),items=[];
+ for(let i=0;i<count;i++){
+  const phase=i*2.399,range=H+40,speed=11+(i%4)*2;
+  const y=((i*.61803398875%1)*range+t*speed)%range-20;
+  const lane=W/count,base=(i+.5)*lane;
+  const x=base+Math.sin(t*.43+phase)*lane*.25+Math.sin(t*.17+phase)*lane*.12;
+  items.push({x:Math.round(x),y:Math.round(y),tilt:Math.sin(t*.8+phase)>0?1:-1,size:i%3===0?2:1,color:['#fff5e7b3','#f5c6d4a6','#f7d9c29e'][i%3]});
+ }
+ return items;
+}
+function drawPetals(t){for(const p of petalPositions(t)){const s=p.size;rect(ctx,p.x,p.y,3*s,2*s,p.color);rect(ctx,p.x+p.tilt*s,p.y+2*s,3*s,2*s,p.color)}}
+function pixelHeart(c,cx,y,color){const pattern=['0110110','1111111','1111111','0111110','0011100','0001000'];for(let row=0;row<6;row++)for(let col=0;col<7;col++)if(pattern[row][col]==='1')rect(c,cx+(col-3)*2,y+row*2,2,2,color)}
+function coupleName(name,x,y,color){ctx.fillStyle='#647448';ctx.fillText(name,x,y);pixelHeart(ctx,x-29,y-11,color);pixelHeart(ctx,x+27,y-11,color)}
+function draw(ts){let dt=Math.max(0,Math.min((ts-lastTime)/1000||0,.06));lastTime=ts;if(!paused)frame+=dt;ctx.drawImage(bg,0,0);const t=frame,C=sceneLayout.center;drawFlowers(t); // The couple never moves into the guest walking region.
+sprite(ctx,C-49,213,{skin:0,hair:0,color:0,shirt:0},3,'groom',t);sprite(ctx,C+49,213,{skin:0,hair:2,color:0,shirt:0},3,'bride',t+.8);
+ctx.textAlign='center';ctx.font='12px "Noto Sans KR",sans-serif';ctx.fillStyle='#647448';coupleName('정근',C-49,280,'#c6b2dc');coupleName('예나',C+49,280,'#e7b3c4');
+drawHearts(t);drawAnimals(t);
+const order=[...guests].sort((a,b)=>a.y-b.y);for(const g of order){let moving=false;if(!paused&&selected!==g){g.wait-=dt;if(g.wait<=0){let dx=g.targetX-g.x,dy=g.targetY-g.y,d=Math.hypot(dx,dy);if(d<3){g.wait=2+Math.random()*4;g.targetX=Math.max(sceneLayout.left,Math.min(sceneLayout.right,g.x+(Math.random()-.5)*170));g.targetY=Math.max(sceneLayout.top,Math.min(sceneLayout.bottom,g.y+(Math.random()-.5)*125))}else{g.x+=dx/d*12*dt;g.y+=dy/d*12*dt;moving=true}}}sprite(ctx,g.x,g.y,g,3,'',t+g.phase,moving);ctx.font='11px "Noto Sans KR",sans-serif';ctx.textAlign='center';let nw=ctx.measureText(g.name).width;rect(ctx,g.x-nw/2-5,g.y+43,nw+10,17,'#f7f4dfd9');ctx.fillStyle='#60704c';ctx.fillText(g.name,g.x,g.y+55)}
+let active=selected||guests.find(g=>g.newUntil>Date.now())||guests[Math.floor(t/5)%guests.length];if(active)bubble(active.message,active.x,active.y-84);if(guests.length>3&&!selected){let other=guests[(Math.floor(t/7)+3)%guests.length];if(other!==active&&Math.hypot(other.x-active.x,other.y-active.y)>220)bubble(other.message,other.x,other.y-84)}
+drawPetals(t);requestAnimationFrame(draw)}
+function renderAvatar(){av.clearRect(0,0,126,126);rect(av,36,121,54,4,'#dce5c9');sprite(av,63,80,chosen,3,'',0)}
+function options(id,prop,values,labels){
+ const root=$(id),isStyle=prop==='hair'||prop==='outfit'||prop==='accessory';
+ values.forEach((value,i)=>{const btn=document.createElement('button');btn.type='button';btn.className=isStyle?'style-card':'swatch';btn.setAttribute('aria-label',labels[i]);btn.title=labels[i];btn.dataset.value=i;
+ if(isStyle){const thumb=document.createElement('canvas');thumb.width=60;thumb.height=64;thumb.setAttribute('aria-hidden','true');const label=document.createElement('span');label.textContent=value;btn.append(thumb,label)}else btn.style.backgroundColor=value;
+ btn.onclick=()=>{chosen[prop]=i;refreshOptions();renderAvatar()};root.append(btn)});
+}
+function refreshOptions(){for(const [id,prop] of [['#skinOptions','skin'],['#hairOptions','hair'],['#colorOptions','color'],['#shirtOptions','shirt'],['#outfitOptions','outfit'],['#accessoryOptions','accessory']])$(id).querySelectorAll('button').forEach(btn=>{btn.setAttribute('aria-pressed',+btn.dataset.value===chosen[prop]);const thumb=btn.querySelector('canvas');if(thumb){const tc=thumb.getContext('2d');tc.clearRect(0,0,60,64);sprite(tc,30,40,{...chosen,[prop]:+btn.dataset.value},1.4,'',0)}})}
+options('#skinOptions','skin',skins,['밝은 피부','살구빛 피부','갈색 피부','짙은 갈색 피부']);
+options('#colorOptions','color',hairs,['소프트 블랙','밀크 코코아','카라멜 브라운','모브 브라운','로즈 핑크','라벤더','더스티 블루','뮤트 틸','로즈 브라운','슬레이트 그레이']);
+options('#shirtOptions','shirt',shirts,['슬레이트 블루','뮤트 틸','소프트 블루','로즈 밀크','라일락','피치 코랄','테라코타 로즈','더스티 아쿠아','베리 밀크','페리윙클']);
+options('#hairOptions','hair',hairNames,hairNames);options('#outfitOptions','outfit',outfitNames,outfitNames);options('#accessoryOptions','accessory',accessoryNames,accessoryNames);refreshOptions();
+$('#randomize').onclick=()=>{chosen={skin:Math.floor(Math.random()*4),hair:Math.floor(Math.random()*10),color:Math.floor(Math.random()*hairs.length),shirt:Math.floor(Math.random()*shirts.length),outfit:Math.floor(Math.random()*10),accessory:Math.floor(Math.random()*accessoryNames.length)};refreshOptions();renderAvatar()};
+function clampInput(el,max){const arr=Array.from(el.value);if(arr.length>max)el.value=arr.slice(0,max).join('')}$('#guestName').addEventListener('input',e=>{if(!e.isComposing)clampInput(e.target,10)});$('#guestName').addEventListener('compositionend',e=>clampInput(e.target,10));function count(e){if(!e.isComposing)clampInput(e.target,30);$('#charCount').textContent=Array.from(e.target.value).length}$('#guestMessage').addEventListener('input',count);$('#guestMessage').addEventListener('compositionend',count);
+function toast(msg){if($('#editorDialog').open)$('#editorStatus').textContent=msg;$('#toast').textContent=msg;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4200)}
+function selectGuest(g){selected=g;let n=$('#selectedNote');n.style.display='block';n.querySelector('b').textContent=g.name+'님의 마음';n.querySelector('span').textContent=g.message}
+function refreshNotes(){$('#guestCount').textContent=guests.length+'명의 마음이 모였어요';$('#noteCount').textContent='총 '+guests.length+'개 · 기본 하객 '+guests.filter(g=>g.example).length+'명 포함';for(let [id,items]of[['#messageList',[...guests].reverse().slice(0,3)],['#allMessages',[...guests].reverse()]]){let root=$(id);root.replaceChildren();items.forEach(g=>{let note=document.createElement('button');note.className='mini-note';note.type='button';note.style.textAlign='left';note.style.color='#536348';let n=document.createElement('b'),m=document.createElement('span');n.textContent=g.name+(examples.includes(g)?'':'')+' 님';m.textContent=g.message;note.append(n,m);note.onclick=()=>{$('#notesDialog').close();selectGuest(g);canvas.scrollIntoView({behavior:paused?'instant':'smooth',block:'center'})};root.append(note)})}}
+let serverMode=false,serverReady=location.protocol==='file:',posting=false,syncing=false,revision=0;
+let adminActive=false,adminToken='',editingId=null,pendingDelete=null;
+const payload=g=>({name:g.name,message:g.message,skin:g.skin,hair:g.hair,color:g.color,shirt:g.shirt,outfit:g.outfit||0,accessory:g.accessory||0});
+async function api(path,method='GET',body){
+ const response=await fetch(path,{method,cache:'no-store',headers:{'Content-Type':'application/json',...(adminToken?{Authorization:'Bearer '+adminToken}:{})},...(body?{body:JSON.stringify(body)}:{})});
+ const data=await response.json();if(!response.ok){if(response.status===401){adminToken='';adminActive=false;updateAdminUI()}throw Error(data.error||'요청을 처리하지 못했습니다.')}return data;
+}
+function clearEdit(){editingId=null;$('#editBanner').hidden=true;$('#cancelEdit').hidden=true;$('.panel').classList.remove('editing');$('#guestForm .submit').textContent='♡  축하하는 마음 남기기  ↗';$('#guestName').value='';$('#guestMessage').value='';$('#charCount').textContent='0'}
+function closeEditor(){if(posting)return;$('#editorDialog').close()}
+$('#openWriter').onclick=()=>{$('#editorStatus').textContent='';$('#editorDialog').showModal()};
+$('#closeEditor').onclick=closeEditor;
+$('#editorDialog').addEventListener('cancel',event=>{if(posting)event.preventDefault()});
+$('#cancelEdit').onclick=()=>{if(posting)return;clearEdit();closeEditor()};
+$('#openMenu').onclick=()=>$('#gardenMenu').showModal();
+$('#closeMenu').onclick=()=>$('#gardenMenu').close();
+$('#openNotes').onclick=()=>{$('#gardenMenu').close();$('#notesDialog').showModal()};
+$('#closeNotes').onclick=()=>$('#notesDialog').close();
+$('#guestForm').onsubmit=async e=>{
+ e.preventDefault();if(posting)return;if(!serverReady){toast('공유 방명록에 연결 중입니다. 잠시 후 다시 시도해 주세요.');return}
+ const name=$('#guestName').value.trim(),message=$('#guestMessage').value.trim();
+ if(!name||!message){toast('이름과 축하 메시지를 모두 적어 주세요.');return}
+ if(Array.from(name).length>10||Array.from(message).length>30){toast('이름은 10자, 메시지는 30자 이내로 적어 주세요.');return}
+ const wasEditing=editingId;if(wasEditing&&!adminActive){toast('관리자 모드에 다시 로그인해 주세요.');return}
+ let g={name,message,...chosen};posting=true;revision++;$('#guestForm .submit').disabled=true;
+ try{
+  if(serverMode)g=await api(wasEditing?'/api/guests/'+encodeURIComponent(wasEditing):'/api/guests',wasEditing?'PATCH':'POST',g);
+  else{g={...(wasEditing?saved.find(p=>p.id===wasEditing):{}),...g,id:wasEditing||crypto.randomUUID()};if(wasEditing&&!saved.some(p=>p.id===wasEditing))throw Error('수정할 미니미를 찾지 못했습니다.');const next=wasEditing?saved.map(p=>p.id===wasEditing?g:p):[...saved,g];storeGuests(next);saved=next}
+  if(wasEditing){const existing=guests.find(p=>p.id===wasEditing);if(existing)Object.assign(existing,g);else addGuest(g,guests.length);clearEdit()}
+  else{addGuest(g,guests.length);guests.at(-1).newUntil=Date.now()+12000;$('#guestMessage').value='';$('#charCount').textContent='0'}
+  selected=null;$('#selectedNote').style.display='none';refreshNotes();renderAdminList();$('#editorDialog').close();toast(wasEditing?'미니미와 방명록을 수정했어요.':name+'님의 미니미가 정원에 도착했어요 ♡');
+  
+ }catch(error){toast(error.message||'저장하지 못했어요. 다시 시도해 주세요.')}
+ finally{posting=false;revision++;$('#guestForm .submit').disabled=false}
+};
+function updateAdminUI(){
+ $('#adminContent').hidden=!adminActive;$('#adminLogin').hidden=adminActive||!serverReady;
+ $('#adminDescription').textContent=serverMode?'생성된 미니미의 외형과 방명록을 수정하거나 삭제할 수 있어요.':serverReady?'관리자 비밀번호를 입력하면 이 브라우저의 하객과 방명록을 관리할 수 있어요.':'공유 서버에 연결 중입니다.';
+ $('#openAdmin').textContent=adminActive?'⚙ 관리자 모드 · 사용 중':'⚙ 관리자 모드';
+ if(adminActive)renderAdminList();else{$('#adminList').replaceChildren();$('#deleteConfirm').hidden=true;pendingDelete=null}
+}
+$('#openAdmin').onclick=()=>{$('#gardenMenu').close();$('#adminError').textContent='';updateAdminUI();$('#adminDialog').showModal()};
+$('#closeAdmin').onclick=()=>$('#adminDialog').close();
+$('#adminLogin').onsubmit=async e=>{
+ e.preventDefault();if(!serverReady)return;const button=$('#adminLogin button');if(button.disabled)return;button.disabled=true;$('#adminError').textContent='';
+ try{
+  if(serverMode){const result=await api('/api/admin/login','POST',{password:$('#adminPassword').value});adminToken=result.token}
+  else throw Error('관리자 로그인은 실행 중인 서버에서만 가능합니다.');
+  adminActive=true;$('#adminPassword').value='';updateAdminUI();
+ }catch(error){$('#adminError').textContent=error.message;$('#adminPassword').value='';$('#adminPassword').focus()}
+ finally{button.disabled=false}
+};
+$('#adminLogout').onclick=async()=>{if(posting)return;if(serverMode&&adminToken){try{await api('/api/admin/logout','POST',{})}catch{}}adminToken='';adminActive=false;clearEdit();updateAdminUI();toast('관리자 모드를 종료했어요.')};
+function beginEdit(g){if(!adminActive||posting)return;editingId=g.id;chosen={skin:g.skin,hair:g.hair,color:g.color,shirt:g.shirt,outfit:g.outfit||0,accessory:g.accessory||0};$('#guestName').value=g.name;$('#guestMessage').value=g.message;$('#charCount').textContent=Array.from(g.message).length;$('#editBanner').textContent=g.name+'님의 미니미를 수정하고 있어요. 외형과 글을 바꾼 뒤 저장해 주세요.';$('#editBanner').hidden=false;$('#cancelEdit').hidden=false;$('.panel').classList.add('editing');$('#guestForm .submit').textContent='✓  수정한 미니미 저장';refreshOptions();renderAvatar();$('#adminDialog').close();$('#editorStatus').textContent='';$('#editorDialog').showModal();$('#guestName').focus()}
+function renderAdminList(){
+ if(!adminActive)return;const list=$('#adminList');list.replaceChildren();const actual=guests;$('#adminCount').textContent='전체 미니미 '+actual.length+'명 · 기본 하객도 수정·삭제 가능';
+ if(!actual.length){const empty=document.createElement('p');empty.className='admin-empty';empty.textContent='아직 생성된 미니미가 없어요. 방명록을 남기면 이곳에서 관리할 수 있습니다.';list.append(empty)}
+ for(const g of [...actual].reverse()){
+  const row=document.createElement('div');row.className='admin-row';const thumb=document.createElement('canvas');thumb.width=60;thumb.height=76;thumb.setAttribute('aria-hidden','true');sprite(thumb.getContext('2d'),30,44,g,1.5,'',0);
+  const copy=document.createElement('div');copy.className='admin-copy';const name=document.createElement('b'),message=document.createElement('p');name.textContent=g.name+(g.example?' · 기본 하객':'');message.textContent=g.message;copy.append(name,message);
+  const actions=document.createElement('div');actions.className='admin-actions';const edit=document.createElement('button'),del=document.createElement('button');edit.type=del.type='button';edit.className='secondary';del.className='danger';edit.textContent='수정';del.textContent='삭제';edit.setAttribute('aria-label',g.name+' 미니미 수정');del.setAttribute('aria-label',g.name+' 미니미 삭제');edit.onclick=()=>beginEdit(g);del.onclick=()=>{if(posting)return;pendingDelete=g.id;$('#deletePrompt').textContent=g.name+'님의 미니미와 “'+g.message+'” 방명록을 삭제할까요? 삭제하면 되돌릴 수 없습니다.';$('#deleteConfirm').hidden=false;$('#confirmDelete').focus();$('#deleteConfirm').scrollIntoView({block:'nearest'})};actions.append(edit,del);row.append(thumb,copy,actions);list.append(row)
+ }
+}
+$('#cancelDelete').onclick=()=>{if(posting)return;pendingDelete=null;$('#deleteConfirm').hidden=true};
+$('#confirmDelete').onclick=async()=>{
+ if(!adminActive||!pendingDelete||posting)return;const id=pendingDelete;posting=true;revision++;$('#confirmDelete').disabled=true;$('#adminError').textContent='';
+ try{if(serverMode)await api('/api/guests/'+encodeURIComponent(id),'DELETE');else{const next=saved.filter(g=>g.id!==id);storeGuests(next);saved=next}
+ guests=guests.filter(g=>g.id!==id);if(selected?.id===id){selected=null;$('#selectedNote').style.display='none'}if(editingId===id)clearEdit();pendingDelete=null;$('#deleteConfirm').hidden=true;refreshNotes();renderAdminList();toast('미니미와 방명록을 삭제했어요.')
+ }catch(error){$('#adminError').textContent=error.message}finally{posting=false;revision++;$('#confirmDelete').disabled=false}
+};
+canvas.onclick=e=>{let box=canvas.getBoundingClientRect(),x=(e.clientX-box.left)*canvas.width/box.width,y=(e.clientY-box.top)*canvas.height/box.height;let g=[...guests].sort((a,b)=>b.y-a.y).find(g=>Math.abs(g.x-x)<37&&y>g.y-80&&y<g.y+55);if(g)selectGuest(g);else{selected=null;$('#selectedNote').style.display='none'}};canvas.style.cursor='pointer';$('#selectedNote button').onclick=()=>{selected=null;$('#selectedNote').style.display='none'};function motionLabel(){$('#motionToggle').textContent=paused?'▷  움직임 다시 시작':'Ⅱ  움직임 쉬어가기';$('#motionToggle').setAttribute('aria-pressed',paused)}$('#motionToggle').onclick=()=>{paused=!paused;motionLabel()};motionLabel();resizeScene();addEventListener('resize',resizeScene);renderAvatar();refreshNotes();requestAnimationFrame(draw);
+async function syncGuests(){
+ if(location.protocol==='file:'||posting||syncing)return;syncing=true;const version=revision;
+ try{const remote=await api('/api/guests');if(!Array.isArray(remote)||version!==revision)return;
+ if(!serverMode){guests=[];selected=null;$('#selectedNote').style.display='none';serverMode=true;adminActive=false;$('.privacy').textContent='모두의 축하가 함께 모이는 정원 · 작성한 글은 서버에 저장됩니다.'}
+ const ids=new Set(remote.map(g=>g.id));guests=guests.filter(g=>ids.has(g.id));
+ for(const g of remote){const current=guests.find(p=>p.id===g.id);if(current)Object.assign(current,g);else addGuest({...g,outfit:g.outfit||0,accessory:g.accessory||0},guests.length)}
+ if(selected){const current=guests.find(g=>g.id===selected.id);if(current)selectGuest(current);else{selected=null;$('#selectedNote').style.display='none'}}
+ if(editingId&&!ids.has(editingId)){clearEdit();toast('다른 관리자가 이 미니미를 삭제했습니다.')}
+ serverReady=true;refreshNotes();if($('#adminDialog').open)updateAdminUI();
+ }catch(e){if(!serverReady)$('.privacy').textContent='공유 서버에 연결할 수 없습니다. server.mjs를 실행해 주세요.'}finally{syncing=false}
+}
+syncGuests();setInterval(syncGuests,5000);
+
+</script></body></html>
