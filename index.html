@@ -117,8 +117,9 @@ function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
  case 8:p(-3,-12,5,1,hair);p(-5,-9,8,1,hair);p(-5,-8,4,1,hair);p(-5,-7,2,1,hair);break;
  case 9:p(-5,-9,3,2,hair);p(-3,-8,3,1,hair);p(4,-8,1,4,hair);p(-5,-6,1,4,hair);break;
  }
+ const smiling=!!role&&celebrationAge()>=0&&celebrationAge()<3.3;
  const blink=!paused&&Math.sin(t*.9+(a.skin||0)*2)>.996;
- ops.push([-2,-5,1,blink?.3:1,ink],[1,-5,1,blink?.3:1,ink]);p(-4,-4,2,2,'#ffad96');p(2,-4,2,2,'#ffad96');ops.push([-.6,-3.6,1.2,.6,'#fa725c']);
+ if(smiling){ops.push([-3,-5,1,1,ink],[-2,-6,1,1,ink],[-1,-5,1,1,ink],[0,-5,1,1,ink],[1,-6,1,1,ink],[2,-5,1,1,ink]);}else ops.push([-2,-5,1,blink?.3:1,ink],[1,-5,1,blink?.3:1,ink]);p(-4,-4,2,2,'#ffad96');p(2,-4,2,2,'#ffad96');ops.push(smiling?[-1,-3.6,2,1,'#fa725c']:[-.6,-3.6,1.2,.6,'#fa725c']);
  if(role==='bride'){p(-4,-10,1,1,cream);p(0,-11,1,1,'#f3c4b2');p(3,-10,1,1,cream);p(-2,1,4,2,'#7b9861');p(-2,0,2,1,'#f2c8b6');p(0,0,2,1,cream);p(0,2,1,2,'#adb080')}
  if(!role){switch(a.accessory||0){
  case 1:for(const xx of [-4,1]){p(xx,-7,3,1,'#725e55');p(xx,-4,3,1,'#725e55');p(xx-1,-6,1,2,'#725e55');p(xx+3,-6,1,2,'#725e55')}p(-1,-6,2,1,'#725e55');break;
@@ -328,13 +329,34 @@ function petalPositions(t){
 function drawPetals(t){for(const p of petalPositions(t)){const s=gardenPixel;rect(ctx,p.x,p.y,s,s,p.color);if(p.size===2)rect(ctx,p.x+p.tilt*s,p.y+s,s,s,p.color)}}
 function pixelHeart(c,cx,y,color){const pattern=['0110110','1111111','1111111','0111110','0011100','0001000'];for(let row=0;row<6;row++)for(let col=0;col<7;col++)if(pattern[row][col]==='1')rect(c,cx+(col-3)*2,y+row*2,2,2,color)}
 function coupleName(name,x,y,color){ctx.fillStyle='#647448';ctx.fillText(name,x,y);pixelHeart(ctx,x-29,y-11,color);pixelHeart(ctx,x+27,y-11,color)}
+let celebrationStart=-1;
+function celebrationAge(){return celebrationStart<0?-1:(Date.now()-celebrationStart)/1000}
+function celebrateCouple(){celebrationStart=Date.now();selected=null;$('#selectedNote').style.display='none'}
+function drawCelebration(){
+ const age=celebrationAge();if(age<0||age>3.3)return;
+ const C=sceneLayout.center,cy=190,heart=['0110110','1111111','1111111','0111110','0011100','0001000'];
+ ctx.save();
+ if(age<1.25){
+  const progress=Math.min(1,age/1.1),size=paused?9:3+Math.floor(8*(1-Math.pow(1-progress,3)));
+  heart.forEach((row,j)=>[...row].forEach((v,i)=>{if(v==='1')rect(ctx,C+(i-3.5)*size,cy+(j-3)*size,size,size,j<2?'#f6acc4':'#ed86aa')}));
+ }else{
+  const t=age-1.25,palette=['#f2a0ba','#f5cd67','#8ebed5','#b9a1d7','#a7ce91','#fff3da'];
+  ctx.globalAlpha=Math.min(1,(3.3-age)/.7);
+  for(let i=0;i<42;i++){
+   const angle=i*2.39996,speed=46+(i%7)*12,dx=Math.cos(angle)*speed*t,dy=Math.sin(angle)*speed*t+32*t*t;
+   const size=6,x=C+dx,y=cy+dy;
+   rect(ctx,x,y,size,i%3===0?size*2:size,palette[i%palette.length]);
+  }
+ }
+ ctx.restore();
+}
 function draw(ts){let dt=Math.max(0,Math.min((ts-lastTime)/1000||0,.06));lastTime=ts;if(!paused)frame+=dt;ctx.drawImage(bg,0,0);const t=frame,C=sceneLayout.center;drawFlowers(t); // The couple never moves into the guest walking region.
 sprite(ctx,C-49,213,{skin:0,hair:0,color:0,shirt:0},3,'groom',t);sprite(ctx,C+49,213,{skin:0,hair:2,color:0,shirt:0},3,'bride',t+.8);
 ctx.textAlign='center';ctx.font='12px "Noto Sans KR",sans-serif';ctx.fillStyle='#647448';coupleName('정근',C-49,280,'#c6b2dc');coupleName('예나',C+49,280,'#e7b3c4');
 drawHearts(t);drawAnimals(t);
 const order=[...guests].sort((a,b)=>a.y-b.y);for(const g of order){let moving=false;if(!paused&&selected!==g&&dragState?.guest!==g){g.wait-=dt;if(g.wait<=0){let dx=g.targetX-g.x,dy=g.targetY-g.y,d=Math.hypot(dx,dy);if(d<3){g.wait=2+Math.random()*4;g.targetX=Math.max(sceneLayout.left,Math.min(sceneLayout.right,g.x+(Math.random()-.5)*170));g.targetY=Math.max(sceneLayout.top,Math.min(sceneLayout.bottom,g.y+(Math.random()-.5)*125))}else{g.x+=dx/d*12*dt;g.y+=dy/d*12*dt;moving=true}}}sprite(ctx,g.x,g.y,g,3,'',t+g.phase,moving);ctx.font='11px "Noto Sans KR",sans-serif';ctx.textAlign='center';let nw=ctx.measureText(g.name).width;roundedBubbleRect(ctx,g.x-nw/2-7,g.y+43,nw+14,17,8,'#f7f4dfd9');ctx.fillStyle='#60704c';ctx.fillText(g.name,g.x,g.y+55)}
 let active=selected||guests.find(g=>g.newUntil>Date.now())||guests[Math.floor(t/5)%guests.length];if(active)bubble(active.message,active.x,active.y-84);if(guests.length>3&&!selected){let other=guests[(Math.floor(t/7)+3)%guests.length];if(other!==active&&Math.hypot(other.x-active.x,other.y-active.y)>220)bubble(other.message,other.x,other.y-84)}
-drawPetals(t);requestAnimationFrame(draw)}
+drawCelebration();drawPetals(t);requestAnimationFrame(draw)}
 function renderAvatar(){av.clearRect(0,0,126,126);rect(av,36,121,54,4,'#dce5c9');sprite(av,63,80,chosen,3,'',0)}
 function options(id,prop,values,labels){
  const root=$(id),isStyle=prop==='hair'||prop==='outfit'||prop==='accessory';
@@ -468,13 +490,13 @@ function draggableAt(p){
 canvas.style.touchAction='none';
 canvas.onpointerdown=e=>{
  if(dragState||e.button!==0)return;
- const p=pointerPoint(e),hit=draggableAt(p);
+ const p=pointerPoint(e);if(Math.abs(p.x-sceneLayout.center)<100&&p.y>125&&p.y<260){celebrateCouple();return}const hit=draggableAt(p);
  if(!hit){selected=null;$('#selectedNote').style.display='none';return}
  dragState={...hit,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,offsetX:hit.x-p.x,offsetY:hit.y-p.y,moved:false};
  canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';e.preventDefault();
 };
 canvas.onpointermove=e=>{
- if(!dragState){canvas.style.cursor=draggableAt(pointerPoint(e))?'grab':'default';return}
+ if(!dragState){const p=pointerPoint(e);canvas.style.cursor=Math.abs(p.x-sceneLayout.center)<100&&p.y>125&&p.y<260?'pointer':draggableAt(p)?'grab':'default';return}
  const d=dragState;if(e.pointerId!==d.pointerId)return;
  if(!d.moved&&Math.hypot(e.clientX-d.startX,e.clientY-d.startY)<5)return;
  d.moved=true;selected=null;$('#selectedNote').style.display='none';
