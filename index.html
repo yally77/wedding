@@ -39,13 +39,13 @@ let chosen={skin:0,hair:0,color:0,shirt:1,outfit:0,accessory:0},paused=matchMedi
 let seed=72;function rnd(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}function rect(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),w,h)}
 // One design cell is two canvas units: fewer, larger pixels and a generous head.
 function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
- c.save();c.imageSmoothingEnabled=false;c.translate(Math.round(x),Math.round(y+(c===ctx?4*scale:0)));const unit=scale*2;
+ c.save();c.imageSmoothingEnabled=false;c.translate(Math.round(x),Math.round(y+(c===ctx?2*scale:0)));const unit=scale*2;
  // One contiguous pixel silhouette: oversized round head and a short, tucked-in body.
- const pixels=new Map(),ops=[],mapY=v=>v<=-3?Math.round((v+3)*1.12-3):Math.round((v+3)*.72-3);
- const p=(px,py,w,h,col)=>{const l=Math.round(px*1.2),r=Math.round((px+w)*1.2),top=mapY(py),bottom=Math.max(top+1,mapY(py+h));ops.push([l,top,r-l,bottom-top,col]);if(col.length===7)for(let yy=top;yy<bottom;yy++)for(let xx=l;xx<r;xx++)pixels.set(xx+','+yy,[xx,yy]);},skin=skins[a.skin],hair=hairs[a.color],cloth=shirts[a.shirt],ink='#242b25',outline=['#cf965d','#bc8154','#95603f','#684634'][a.skin||0],cream='#fff3d7';
+ const pixels=new Map(),ops=[],mapY=v=>Math.round(v);
+ const p=(px,py,w,h,col)=>{const l=Math.round(px),r=Math.round(px+w),top=mapY(py),bottom=Math.max(top+1,mapY(py+h));ops.push([l,top,r-l,bottom-top,col]);if(col.length===7)for(let yy=top;yy<bottom;yy++)for(let xx=l;xx<r;xx++)pixels.set(xx+','+yy,[xx,yy,col]);},skin=skins[a.skin],hair=hairs[a.color],cloth=shirts[a.shirt],ink='#242b25',outline=['#cf965d','#bc8154','#95603f','#684634'][a.skin||0],cream='#fff3d7';
  const hs=role==='groom'?4:role==='bride'?2:a.hair, outfit=a.outfit||0;
  c.translate(0,paused?0:Math.round(Math.sin(t*2.2)*.14*unit));
- const step=walking&&!paused?Math.round(Math.sin(t*7))*.45:0;
+ const step=walking&&!paused?Math.sin(t*7):0;
  // Hair silhouettes behind the face.
  if([2,9].includes(hs)){p(-5,-9,10,11,hair);p(-6,-6,1,8,hair);p(5,-6,1,8,hair)}
  if(hs===3){p(-6,-8,12,7,hair);p(-5,-2,10,1,hair)}
@@ -53,26 +53,28 @@ function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
  if(hs===6){p(-7,-8,3,7,hair);p(4,-8,3,7,hair);p(-6,-7,1,1,'#d89482');p(5,-7,1,1,'#d89482')}
  if(hs===7){p(1,-13,3,3,hair);p(0,-12,5,2,hair);p(1,-10,3,1,'#c4a372')}
  if(hs===9){p(-7,-5,2,3,hair);p(-6,-2,2,5,hair);p(5,-3,2,4,hair)}
- // Small feet, body and blocky sleeves.
- let pants=role==='groom'?'#cfc7b6':'#44545a';
- p(-2,2,2,4+step,pants);p(1,2,2,4-step,pants);p(-2,6+step,2,1,outline);p(1,6-step,2,1,outline);
+ // Uniform square cells, rounded hands and a four-cell-wide torso half.
  p(-4,-2,8,5,role==='groom'?'#e7e0d2':role==='bride'?'#fff9e7':cloth);
- p(-5,-1,1,3,skin);p(4,-1,1,3,skin);p(-4,-2,1,3,cloth);p(3,-2,1,3,cloth);
+ p(-6,0,2,2,skin);p(4,0,2,2,skin);
+ p(-4,-1,1,2,cloth);p(3,-1,1,2,cloth);
  if(!role){switch(outfit){
  case 0:p(-1,-2,2,1,cream);p(1,0,1,1,cream);break;
  case 1:for(let yy=-1;yy<3;yy+=2)p(-3,yy,6,1,cream);break;
  case 2:p(-4,-2,8,2,cloth);p(-2,-2,4,1,cream);p(-2,1,4,1,'#00000024');p(-1,-1,1,1,cream);p(1,-1,1,1,cream);break;
  case 3:p(-1,-2,2,5,cream);p(0,-1,1,1,'#ac925f');p(0,1,1,1,'#ac925f');break;
  case 4:p(-1,-2,2,5,cream);p(0,-1,1,3,'#6d584c');p(-2,-1,1,1,cream);p(2,-1,1,1,cream);break;
- case 5:p(-3,-2,6,2,cream);p(-2,-2,1,3,cloth);p(1,-2,1,3,cloth);p(-3,1,6,3,cloth);p(-2,3,2,3,cloth);p(1,3,2,3,cloth);p(-1,1,2,1,'#ffffff50');break;
- case 6:p(-4,2,8,3,cloth);p(-5,4,10,1,cloth);p(-3,1,6,1,cream);p(1,3,1,1,cream);break;
- case 7:p(-3,-2,6,3,cream);p(-4,1,8,4,cloth);p(-2,2,1,3,'#00000020');p(1,2,1,3,'#00000020');break;
- case 8:p(-3,-2,6,3,cream);p(-4,1,8,3,cloth);p(-5,3,10,2,cloth);p(-1,-2,1,2,cloth);p(0,-1,2,1,cloth);p(1,0,1,2,cloth);break;
+ case 5:p(-3,-2,6,2,cream);p(-2,-2,1,3,cloth);p(1,-2,1,3,cloth);p(-3,1,6,3,cloth);p(-1,1,2,1,'#ffffff50');break;
+ case 6:p(-4,1,8,2,cloth);p(-3,1,6,1,cream);p(1,2,1,1,cream);break;
+ case 7:p(-3,-2,6,3,cream);p(-4,1,8,2,cloth);p(-2,1,1,2,'#00000020');p(1,1,1,2,'#00000020');break;
+ case 8:p(-3,-2,6,3,cream);p(-4,1,8,2,cloth);p(-1,-2,1,2,cloth);p(0,-1,2,1,cloth);p(1,0,1,2,cloth);break;
  case 9:p(-4,-1,1,3,cream);p(3,-1,1,3,cream);p(-1,-2,2,1,cream);p(0,-1,1,1,cream);p(-3,2,6,1,'#00000022');break;
  }}
  if(role==='groom'){p(-4,-1,1,3,'#e7e0d2');p(3,-1,1,3,'#e7e0d2');p(-1,-2,2,5,'#fff9ed');p(0,-1,1,3,'#b9aa90');p(-2,-1,1,2,'#f7f0df');p(2,-1,1,2,'#f7f0df')}
- if(role==='bride'){p(-4,-1,1,3,skin);p(3,-1,1,3,skin);p(-4,2,8,2,'#fff9e7');p(-5,4,10,2,'#fff9e7');p(-4,6,8,1,'#dedec9');p(2,3,1,3,'#eae9d4')}
- p(-1,-3,2,1,skin);p(-5,-9,10,5,skin);p(-4,-4,8,2,skin);p(-3,-2,6,1,skin);p(-6,-7,1,2,skin);p(5,-7,1,2,skin);
+ if(role==='bride'){p(-4,-1,1,3,skin);p(3,-1,1,3,skin);p(-4,1,8,2,'#fff9e7');p(2,1,1,2,'#eae9d4')}
+ // One visible leg cell at rest; a walking leg extends by exactly one cell.
+ p(-3,3,3,1+(step>.25?1:0),skin);p(1,3,3,1+(step<-.25?1:0),skin);
+ p(-2,-12,4,1,skin);p(-4,-11,8,1,skin);p(-5,-10,10,1,skin);
+ p(-6,-9,12,6,skin);p(-5,-3,10,1,skin);p(-4,-2,8,1,skin);
  // Ten deliberately different hair outlines and fringes.
  p(-2,-12,4,1,hair);p(-4,-11,8,1,hair);p(-5,-10,10,1,hair);
  switch(hs){
@@ -88,7 +90,7 @@ function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
  case 9:p(-5,-9,3,2,hair);p(-3,-8,3,1,hair);p(4,-8,1,4,hair);p(-5,-6,1,4,hair);break;
  }
  const blink=!paused&&Math.sin(t*.9+(a.skin||0)*2)>.996;
- p(-2,-5,1,1,ink);p(1,-5,1,1,ink);if(blink){p(-2,-5,1,1,skin);p(1,-5,1,1,skin);p(-2,-4,1,1,ink);p(1,-4,1,1,ink)}p(-4,-4,2,2,'#ffad96');p(2,-4,2,2,'#ffad96');p(-1,-3,1,1,'#fa725c');
+ ops.push([-2,-5,1,blink?.3:1,ink],[1,-5,1,blink?.3:1,ink]);p(-4,-4,2,2,'#ffad96');p(2,-4,2,2,'#ffad96');ops.push([-.6,-3.6,1.2,.6,'#fa725c']);
  if(role==='bride'){p(-4,-10,1,1,cream);p(0,-11,1,1,'#f3c4b2');p(3,-10,1,1,cream);p(-2,1,4,2,'#7b9861');p(-2,0,2,1,'#f2c8b6');p(0,0,2,1,cream);p(0,2,1,2,'#adb080')}
  if(!role){switch(a.accessory||0){
  case 1:for(const xx of [-4,1]){p(xx,-7,3,1,'#725e55');p(xx,-4,3,1,'#725e55');p(xx-1,-6,1,2,'#725e55');p(xx+3,-6,1,2,'#725e55')}p(-1,-6,2,1,'#725e55');break;
@@ -102,8 +104,9 @@ function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
  case 9:p(-4,-12,1,3,'#dbb86b');p(0,-13,1,4,'#dbb86b');p(4,-12,1,3,'#dbb86b');p(-4,-10,9,2,'#dbb86b');p(0,-10,1,1,'#da91a7');break;
  }}
  const paint=(px,py,w,h,col)=>{c.fillStyle=col;const l=Math.round(px*unit),top=Math.round(py*unit);c.fillRect(l,top,Math.round((px+w)*unit)-l,Math.round((py+h)*unit)-top)};
- paint(-4,mapY(8),8,1,'#53614025');
- for(const [px,py]of pixels.values())for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]])if(!pixels.has((px+dx)+','+(py+dy)))paint(px+dx,py+dy,1,1,outline);
+ paint(-4,5,8,1,'#53614025');
+ const shade=col=>'#'+[1,3,5].map(i=>Math.round(parseInt(col.slice(i,i+2),16)*.73).toString(16).padStart(2,'0')).join('');
+ for(const [px,py,col]of pixels.values())for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]])if(!pixels.has((px+dx)+','+(py+dy)))paint(px+dx,py+dy,1,1,shade(col));
  for(const op of ops)paint(...op);
  c.restore();
 }
