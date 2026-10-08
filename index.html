@@ -39,7 +39,7 @@ let chosen={skin:0,hair:0,color:0,shirt:1,outfit:0,accessory:0},paused=matchMedi
 let seed=72;function rnd(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}function rect(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),w,h)}
 // One design cell is two canvas units: fewer, larger pixels and a generous head.
 function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
- c.save();c.imageSmoothingEnabled=false;c.translate(Math.round(x),Math.round(y));const unit=scale*2;
+ c.save();c.imageSmoothingEnabled=false;c.translate(Math.round(x),Math.round(y+(c===ctx?8*scale:0)));const unit=scale*2;
  // One contiguous pixel silhouette: oversized round head and a short, tucked-in body.
  const pixels=new Map(),ops=[],mapY=v=>v<=-3?Math.round((v+3)*1.12-3):Math.round((v+3)*.55-3);
  const p=(px,py,w,h,col)=>{const l=Math.round(px*1.2),r=Math.round((px+w)*1.2),top=mapY(py),bottom=Math.max(top+1,mapY(py+h));ops.push([l,top,r-l,bottom-top,col]);if(col.length===7)for(let yy=top;yy<bottom;yy++)for(let xx=l;xx<r;xx++)pixels.set(xx+','+yy,[xx,yy]);},skin=skins[a.skin],hair=hairs[a.color],cloth=shirts[a.shirt],ink='#24272d',cream='#fff3d7';
