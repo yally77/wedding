@@ -206,14 +206,14 @@ function weddingBanner(C){
  // Preserve the heart-shaped upper lobes; use a flat base with soft pixel corners.
  const topBands=[[-88,-44,44,88],[-104,-28,28,104],[-112,-16,16,112],[-120,-8,8,120],[-124,-4,4,124]];
  for(const [offset,color]of [[2,'#e4d4b4'],[0,'#fff5dd']]){
-  topBands.forEach((runs,row)=>{for(let i=0;i<runs.length;i+=2)rect(b,C+runs[i],58+row*4+offset,runs[i+1]-runs[i],4,color)});
-  rect(b,C-124,78+offset,248,48,color);
-  rect(b,C-122,126+offset,244,4,color);
-  rect(b,C-118,130+offset,236,4,color);
-  rect(b,C-112,134+offset,224,4,color);
+  topBands.forEach((runs,row)=>{for(let i=0;i<runs.length;i+=2)rect(b,C+Math.round(runs[i]*1.2),54+row*4+offset,Math.round(runs[i+1]*1.2)-Math.round(runs[i]*1.2),4,color)});
+  rect(b,C-149,74+offset,298,52,color);
+  rect(b,C-145,126+offset,290,4,color);
+  rect(b,C-141,130+offset,282,4,color);
+  rect(b,C-135,134+offset,270,4,color);
  }
- pixelLettering(b,'Happy Wedding!',C,84,3,'#a77c6e');
- pixelLettering(b,'2026.10.24',C,112,3,'#768563');
+ pixelLettering(b,'Happy Wedding!',C,78,5,'#a77c6e');
+ pixelLettering(b,'2026.10.24',C,116,3,'#768563');
 }
 
 function background(){
