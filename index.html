@@ -39,10 +39,10 @@ let chosen={skin:0,hair:0,color:0,shirt:1,outfit:0,accessory:0},paused=matchMedi
 let seed=72;function rnd(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}function rect(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),w,h)}
 // One design cell is two canvas units: fewer, larger pixels and a generous head.
 function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
- c.save();c.imageSmoothingEnabled=false;c.translate(Math.round(x),Math.round(y+(c===ctx?8*scale:0)));const unit=scale*2;
+ c.save();c.imageSmoothingEnabled=false;c.translate(Math.round(x),Math.round(y+(c===ctx?4*scale:0)));const unit=scale*2;
  // One contiguous pixel silhouette: oversized round head and a short, tucked-in body.
- const pixels=new Map(),ops=[],mapY=v=>v<=-3?Math.round((v+3)*1.12-3):Math.round((v+3)*.55-3);
- const p=(px,py,w,h,col)=>{const l=Math.round(px*1.2),r=Math.round((px+w)*1.2),top=mapY(py),bottom=Math.max(top+1,mapY(py+h));ops.push([l,top,r-l,bottom-top,col]);if(col.length===7)for(let yy=top;yy<bottom;yy++)for(let xx=l;xx<r;xx++)pixels.set(xx+','+yy,[xx,yy]);},skin=skins[a.skin],hair=hairs[a.color],cloth=shirts[a.shirt],ink='#24272d',cream='#fff3d7';
+ const pixels=new Map(),ops=[],mapY=v=>v<=-3?Math.round((v+3)*1.12-3):Math.round((v+3)*.72-3);
+ const p=(px,py,w,h,col)=>{const l=Math.round(px*1.2),r=Math.round((px+w)*1.2),top=mapY(py),bottom=Math.max(top+1,mapY(py+h));ops.push([l,top,r-l,bottom-top,col]);if(col.length===7)for(let yy=top;yy<bottom;yy++)for(let xx=l;xx<r;xx++)pixels.set(xx+','+yy,[xx,yy]);},skin=skins[a.skin],hair=hairs[a.color],cloth=shirts[a.shirt],ink='#242b25',outline=['#cf965d','#bc8154','#95603f','#684634'][a.skin||0],cream='#fff3d7';
  const hs=role==='groom'?4:role==='bride'?2:a.hair, outfit=a.outfit||0;
  c.translate(0,paused?0:Math.round(Math.sin(t*2.2)*.14*unit));
  const step=walking&&!paused?Math.round(Math.sin(t*7))*.45:0;
@@ -55,9 +55,9 @@ function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
  if(hs===9){p(-7,-5,2,3,hair);p(-6,-2,2,5,hair);p(5,-3,2,4,hair)}
  // Small feet, body and blocky sleeves.
  let pants=role==='groom'?'#cfc7b6':'#44545a';
- p(-2,2,2,4+step,pants);p(1,2,2,4-step,pants);p(-2,6+step,2,1,ink);p(1,6-step,2,1,ink);
- p(-3,-2,6,5,role==='groom'?'#e7e0d2':role==='bride'?'#fff9e7':cloth);
- p(-4,-1,1,3,cloth);p(3,-1,1,3,cloth);p(-4,2,1,1,skin);p(3,2,1,1,skin);
+ p(-2,2,2,4+step,pants);p(1,2,2,4-step,pants);p(-2,6+step,2,1,outline);p(1,6-step,2,1,outline);
+ p(-4,-2,8,5,role==='groom'?'#e7e0d2':role==='bride'?'#fff9e7':cloth);
+ p(-5,-1,1,3,skin);p(4,-1,1,3,skin);p(-4,-2,1,3,cloth);p(3,-2,1,3,cloth);
  if(!role){switch(outfit){
  case 0:p(-1,-2,2,1,cream);p(1,0,1,1,cream);break;
  case 1:for(let yy=-1;yy<3;yy+=2)p(-3,yy,6,1,cream);break;
@@ -88,7 +88,7 @@ function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
  case 9:p(-5,-9,3,2,hair);p(-3,-8,3,1,hair);p(4,-8,1,4,hair);p(-5,-6,1,4,hair);break;
  }
  const blink=!paused&&Math.sin(t*.9+(a.skin||0)*2)>.996;
- p(-3,-8,2,1,ink);p(1,-8,2,1,ink);p(-3,-6,1,blink?1:2,ink);p(2,-6,1,blink?1:2,ink);p(-4,-3,1,1,'#dc9e90');p(3,-3,1,1,'#dc9e90');
+ p(-2,-5,1,1,ink);p(1,-5,1,1,ink);if(blink){p(-2,-5,1,1,skin);p(1,-5,1,1,skin);p(-2,-4,1,1,ink);p(1,-4,1,1,ink)}p(-4,-4,2,2,'#ffad96');p(2,-4,2,2,'#ffad96');p(-1,-3,1,1,'#fa725c');
  if(role==='bride'){p(-4,-10,1,1,cream);p(0,-11,1,1,'#f3c4b2');p(3,-10,1,1,cream);p(-2,1,4,2,'#7b9861');p(-2,0,2,1,'#f2c8b6');p(0,0,2,1,cream);p(0,2,1,2,'#adb080')}
  if(!role){switch(a.accessory||0){
  case 1:for(const xx of [-4,1]){p(xx,-7,3,1,'#725e55');p(xx,-4,3,1,'#725e55');p(xx-1,-6,1,2,'#725e55');p(xx+3,-6,1,2,'#725e55')}p(-1,-6,2,1,'#725e55');break;
@@ -103,7 +103,7 @@ function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
  }}
  const paint=(px,py,w,h,col)=>{c.fillStyle=col;const l=Math.round(px*unit),top=Math.round(py*unit);c.fillRect(l,top,Math.round((px+w)*unit)-l,Math.round((py+h)*unit)-top)};
  paint(-4,mapY(8),8,1,'#53614025');
- for(const [px,py]of pixels.values())for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]])if(!pixels.has((px+dx)+','+(py+dy)))paint(px+dx,py+dy,1,1,ink);
+ for(const [px,py]of pixels.values())for(const [dx,dy]of [[-1,0],[1,0],[0,-1],[0,1]])if(!pixels.has((px+dx)+','+(py+dy)))paint(px+dx,py+dy,1,1,outline);
  for(const op of ops)paint(...op);
  c.restore();
 }
