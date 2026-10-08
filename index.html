@@ -136,12 +136,31 @@ function drawHearts(t){for(let i=0;i<3;i++){const h=heartState(t,i),color=['#dfa
  if(h.phase<.68){const size=h.phase<.1?1:2,pattern=['0110110','1111111','1111111','0111110','0011100','0001000'];for(let yy=0;yy<pattern.length;yy++)for(let xx=0;xx<7;xx++)if(pattern[yy][xx]==='1')rect(ctx,h.x+(xx-3)*size,h.y+yy*size,size,size,color)}
  else{const r=4+(h.phase-.68)*65;for(let n=0;n<6;n++){const angle=n*Math.PI/3;rect(ctx,h.x+Math.cos(angle)*r,h.y+5+Math.sin(angle)*r,2,2,color)}}
 }}
-function bush(x,y,w=64){tile(b,x+8,y+24,w-16,12,'#a3bd80');tile(b,x,y+8,w,24,'#a3bd80');tile(b,x+12,y,w-24,32,'#adc78a');tile(b,x+20,y+4,12,8,'#b8d197')}
+// Match the minimi's scene pixel: scale 3 × two canvas units = 6.
+const gardenPixel=6;
+function foliage(x,y,rows,fill,edge,highlight){
+ const cells=new Set();
+ rows.forEach(([left,right],yy)=>{for(let xx=left;xx<right;xx++)cells.add(xx+','+yy)});
+ for(const key of cells){
+  const [xx,yy]=key.split(',').map(Number);
+  const border=[[-1,0],[1,0],[0,-1],[0,1]].some(([dx,dy])=>!cells.has((xx+dx)+','+(yy+dy)));
+  const color=border?edge:(yy<4&&xx>rows[yy][0]+2&&xx<rows[yy][0]+6?highlight:fill);
+  rect(b,Math.round(x/gardenPixel)*gardenPixel+xx*gardenPixel,Math.round(y/gardenPixel)*gardenPixel+yy*gardenPixel,gardenPixel,gardenPixel,color);
+ }
+}
+function bush(x,y,w=64){
+ const n=Math.max(5,Math.round(w/gardenPixel));
+ foliage(x,y,[[2,n-2],[1,n-1],[0,n],[0,n],[1,n-1],[2,n-2]],'#adc78a','#819b64','#bed79a');
+}
 function tree(x,y){
- tile(b,x-12,y+64,24,72,'#b49b71');tile(b,x-4,y+72,8,64,'#cbb187');
- tile(b,x-64,y+24,128,56,'#9dbb79');tile(b,x-48,y+8,96,88,'#9dbb79');tile(b,x-28,y,56,100,'#9dbb79');
- tile(b,x-52,y+16,104,52,'#aecb8d');tile(b,x-32,y+4,64,80,'#aecb8d');tile(b,x-28,y+16,24,12,'#bed799');
- flower(b,x-32,y+40,4,'#f9dece',false);flower(b,x+24,y+64,4,'#fff5d4',false);flower(b,x+8,y+12,4,'#f9dece',false);
+ const g=gardenPixel,tx=Math.round(x/g)*g,ty=Math.round(y/g)*g;
+ // Trunk and crown each use a single-cell contour.
+ rect(b,tx-2*g,ty+10*g,4*g,12*g,'#997c57');
+ rect(b,tx-g,ty+10*g,2*g,11*g,'#c4a77d');
+ foliage(tx-10*g,ty,[[7,14],[5,16],[3,18],[2,19],[1,20],[0,21],[0,21],[0,21],[0,21],[0,21],[1,20],[1,20],[2,19],[3,18],[5,16],[7,14]],'#aecb8d','#819e65','#c3da9f');
+ flower(b,tx-5*g,ty+6*g,g,'#f9dece',false);
+ flower(b,tx+4*g,ty+11*g,g,'#fff5d4',false);
+ flower(b,tx+2*g,ty+2*g,g,'#f9dece',false);
 }
 function planter(x,y){tile(b,x-28,y+20,56,20,'#d0b891');tile(b,x-32,y+16,64,8,'#e0c9a3');bush(x-32,y-8,64);flower(b,x-20,y-4,4,'#f3c3b1');flower(b,x+16,y-12,4,'#fff8dc');flower(b,x+4,y+4,4,'#f8e1a5')}
 
@@ -174,11 +193,14 @@ function background(){
  for(let row=0;row<Math.ceil(H/96);row++)for(let col=0;col<Math.ceil(W/112);col++){
   const x=24+col*112+(row%2)*36,y=36+row*96;
   if(Math.abs(x-C)<106&&y>290)continue;
-  tile(b,x,y,8,4,'#abc88a');tile(b,x+4,y-4,4,8,'#abc88a');
+  const gx=Math.round(x/gardenPixel)*gardenPixel,gy=Math.round(y/gardenPixel)*gardenPixel;
+  rect(b,gx,gy,gardenPixel*2,gardenPixel,'#a0bb80');rect(b,gx+gardenPixel,gy-gardenPixel,gardenPixel,gardenPixel,'#a0bb80');
  }
  // Soft cream aisle, with a stepped edge and widely spaced tiles.
  tile(b,C-64,276,128,H-276,'#ece3bc');tile(b,C-76,348,152,H-348,'#ece3bc');
  for(let y=368;y<H;y+=96){tile(b,C-40,y,56,4,'#e0d4a9');tile(b,C+28,y+40,20,4,'#e0d4a9')}
+ // A staggered flowering canopy fills the upper edge, behind the sign.
+ for(let x=-24,i=0;x<W+90;x+=114,i++)tree(x,-78+(i%3)*12);
  // Layer flowering trees behind the platform and arch, leaving the sign legible.
  for(const side of [-1,1]){tree(C+side*196,56);tree(C+side*110,-42);tree(C+side*34,-64);bush(C+side*180-36,172,72)}
  tile(b,C-160,280,320,20,'#cbbb96');tile(b,C-160,272,320,12,'#f9edca');tile(b,C-144,256,288,16,'#dfd0aa');tile(b,C-136,208,272,48,'#f6ebcc');tile(b,C-136,252,272,8,'#eadcb6');
@@ -273,7 +295,7 @@ function petalPositions(t){
  }
  return items;
 }
-function drawPetals(t){for(const p of petalPositions(t)){const s=p.size;rect(ctx,p.x,p.y,3*s,2*s,p.color);rect(ctx,p.x+p.tilt*s,p.y+2*s,3*s,2*s,p.color)}}
+function drawPetals(t){for(const p of petalPositions(t)){const s=gardenPixel;rect(ctx,p.x,p.y,s,s,p.color);if(p.size===2)rect(ctx,p.x+p.tilt*s,p.y+s,s,s,p.color)}}
 function pixelHeart(c,cx,y,color){const pattern=['0110110','1111111','1111111','0111110','0011100','0001000'];for(let row=0;row<6;row++)for(let col=0;col<7;col++)if(pattern[row][col]==='1')rect(c,cx+(col-3)*2,y+row*2,2,2,color)}
 function coupleName(name,x,y,color){ctx.fillStyle='#647448';ctx.fillText(name,x,y);pixelHeart(ctx,x-29,y-11,color);pixelHeart(ctx,x+27,y-11,color)}
 function draw(ts){let dt=Math.max(0,Math.min((ts-lastTime)/1000||0,.06));lastTime=ts;if(!paused)frame+=dt;ctx.drawImage(bg,0,0);const t=frame,C=sceneLayout.center;drawFlowers(t); // The couple never moves into the guest walking region.
