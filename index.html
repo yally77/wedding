@@ -3,7 +3,7 @@
 <head>
 <meta name="guestbook-api-base" content="https://weddingluna.netlify.app"><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>우리의 작은 결혼식 · 픽셀 방명록</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gugi&family=Noto+Sans+KR:wght@400;500;600&display=swap');
 :root{--ink:#43573e;--muted:#889579;--line:#e1e6d6;--paper:#fffef6}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:#b9d39b;color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-size:13px;overflow:hidden}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button:focus-visible{outline:3px solid #ab9863;outline-offset:3px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .garden-world{position:fixed;inset:0}#garden{display:block;width:100%;height:100%;image-rendering:pixelated}.garden-actions{position:absolute;inset:auto 0 0;display:flex;justify-content:flex-start;gap:10px;align-items:center;padding:22px max(24px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));pointer-events:none}.garden-actions button{pointer-events:auto;border:1px solid #f6f3dc90;color:#60714e;background:#fffbeaD9;box-shadow:0 2px 0 #7b936124;backdrop-filter:blur(5px)}.write-button{border-radius:24px;padding:12px 19px;font-size:12px;display:flex;gap:9px;align-items:center}.write-button span{font-size:17px;line-height:1}.write-button:hover{background:#fffcec}.quiet-menu{width:44px;height:44px;flex-shrink:0;border-radius:15px;font-size:20px;line-height:16px;letter-spacing:2px}.garden-actions .quiet-menu{background:#fffbea91;border-color:#f6f3dc50;color:#6f8159}
 .selected-note{position:fixed;top:20px;left:50%;transform:translateX(-50%);max-width:calc(100% - 36px);width:max-content;min-width:190px;background:#fffef1;border:0;border-radius:20px;padding:16px 42px 14px 19px;line-height:1.8;font-size:13px;box-shadow:none;display:none}.selected-note b{display:block;font-size:10px;color:#8b9878;margin-bottom:4px}.selected-note button{position:absolute;right:9px;top:9px;background:none;border:0;color:#8a9876;font-size:18px}
@@ -22,13 +22,18 @@ dialog{color:var(--ink);border:1px solid #e0e5d1;background:var(--paper);border-
 .garden-actions .write-button{min-height:44px;font-weight:600;letter-spacing:.2px}
 .garden-actions button:hover,.garden-actions button:focus-visible{background:#fffbe9;box-shadow:inset 0 0 0 3px #7e9365}
 .write-button svg{width:18px;height:18px;display:block;shape-rendering:crispEdges}
+@font-face{font-family:'Galmuri11';src:url('https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/Galmuri11.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+.garden-actions button{clip-path:none;border-radius:14px;box-shadow:inset 0 0 0 3px #b3b58d;font-family:'Galmuri11','Gugi',sans-serif}
+.garden-actions .write-button{font-weight:400;font-size:12px;gap:10px}
+.garden-actions .quiet-menu{border-radius:14px}
+.write-button svg{width:22px;height:22px}
 </style></head>
 <body>
 <main class="garden-world" aria-label="우리의 작은 결혼식 방명록">
 <h1 class="sr-only">우리의 작은 결혼식 — 픽셀 정원 방명록 · 결혼 날짜 2026.10.24</h1>
 <canvas id="garden" width="960" height="780" aria-label="Happy Wedding! · 2026.10.24 웨딩 플래카드와 꽃 아치 아래 신랑 정근과 신부 예나, 정원을 산책하는 하객들, 작은 토끼와 다람쥐와 새. 하객을 누르면 메시지를 볼 수 있고, 하객과 소동물은 드래그해서 옮길 수 있습니다. 정원 메뉴에서는 모든 방명록을 읽을 수 있습니다."></canvas>
 <div class="selected-note" id="selectedNote"><b></b><span></span><button aria-label="말풍선 닫기" type="button">×</button></div>
-<nav class="garden-actions" aria-label="방명록 메뉴"><button id="openMenu" class="quiet-menu" type="button" aria-label="정원 메뉴 열기" aria-haspopup="dialog">···</button><button id="openWriter" class="write-button" type="button" aria-haspopup="dialog"><span aria-hidden="true"><svg viewBox="0 0 12 12"><path fill="currentColor" d="M8 1h2v1h1v2H9V3H8zM7 3h2v2H7v2H5v2H3V7h2V5h2zM2 8h1v2h2v1H1V9h1z"/></svg></span> 방명록 쓰기</button></nav>
+<nav class="garden-actions" aria-label="방명록 메뉴"><button id="openMenu" class="quiet-menu" type="button" aria-label="정원 메뉴 열기" aria-haspopup="dialog">···</button><button id="openWriter" class="write-button" type="button" aria-haspopup="dialog"><span aria-hidden="true"><svg viewBox="0 0 16 16"><path fill="#65734e" d="M10 1h3v1h1v1h1v3h-1v1h-1v1h-1v1h-1v1h-1v1H9v1H8v1H7v1H2v-5h1V8h1V7h1V6h1V5h1V4h1V3h1V2h1z"/><path fill="#d9ad65" d="M9 4h2v1h1v2h-1v1h-1v1H9v1H8v1H6V9h1V8h1V7h1z"/><path fill="#efb4ae" d="M11 2h2v1h1v2h-2V4h-1z"/><path fill="#fff0cf" d="M4 10h1v1h1v1H3v-1h1z"/></svg></span> 방명록 쓰기</button></nav>
 </main>
 <dialog id="editorDialog" class="editor-dialog panel" aria-labelledby="editorTitle">
 <div class="editor-heading"><div><div class="panel-kicker">A LITTLE NOTE OF LOVE</div><h2 id="editorTitle">나의 작은 축하를 남겨요</h2></div><button type="button" id="closeEditor" class="dialog-close" aria-label="방명록 작성 창 닫기">×</button></div>
@@ -314,7 +319,7 @@ function draw(ts){let dt=Math.max(0,Math.min((ts-lastTime)/1000||0,.06));lastTim
 sprite(ctx,C-49,213,{skin:0,hair:0,color:0,shirt:0},3,'groom',t);sprite(ctx,C+49,213,{skin:0,hair:2,color:0,shirt:0},3,'bride',t+.8);
 ctx.textAlign='center';ctx.font='12px "Noto Sans KR",sans-serif';ctx.fillStyle='#647448';coupleName('정근',C-49,280,'#c6b2dc');coupleName('예나',C+49,280,'#e7b3c4');
 drawHearts(t);drawAnimals(t);
-const order=[...guests].sort((a,b)=>a.y-b.y);for(const g of order){let moving=false;if(!paused&&selected!==g&&dragState?.guest!==g){g.wait-=dt;if(g.wait<=0){let dx=g.targetX-g.x,dy=g.targetY-g.y,d=Math.hypot(dx,dy);if(d<3){g.wait=2+Math.random()*4;g.targetX=Math.max(sceneLayout.left,Math.min(sceneLayout.right,g.x+(Math.random()-.5)*170));g.targetY=Math.max(sceneLayout.top,Math.min(sceneLayout.bottom,g.y+(Math.random()-.5)*125))}else{g.x+=dx/d*12*dt;g.y+=dy/d*12*dt;moving=true}}}sprite(ctx,g.x,g.y,g,3,'',t+g.phase,moving);ctx.font='11px "Noto Sans KR",sans-serif';ctx.textAlign='center';let nw=ctx.measureText(g.name).width;rect(ctx,g.x-nw/2-5,g.y+43,nw+10,17,'#f7f4dfd9');ctx.fillStyle='#60704c';ctx.fillText(g.name,g.x,g.y+55)}
+const order=[...guests].sort((a,b)=>a.y-b.y);for(const g of order){let moving=false;if(!paused&&selected!==g&&dragState?.guest!==g){g.wait-=dt;if(g.wait<=0){let dx=g.targetX-g.x,dy=g.targetY-g.y,d=Math.hypot(dx,dy);if(d<3){g.wait=2+Math.random()*4;g.targetX=Math.max(sceneLayout.left,Math.min(sceneLayout.right,g.x+(Math.random()-.5)*170));g.targetY=Math.max(sceneLayout.top,Math.min(sceneLayout.bottom,g.y+(Math.random()-.5)*125))}else{g.x+=dx/d*12*dt;g.y+=dy/d*12*dt;moving=true}}}sprite(ctx,g.x,g.y,g,3,'',t+g.phase,moving);ctx.font='11px "Noto Sans KR",sans-serif';ctx.textAlign='center';let nw=ctx.measureText(g.name).width;roundedBubbleRect(ctx,g.x-nw/2-7,g.y+43,nw+14,17,8,'#f7f4dfd9');ctx.fillStyle='#60704c';ctx.fillText(g.name,g.x,g.y+55)}
 let active=selected||guests.find(g=>g.newUntil>Date.now())||guests[Math.floor(t/5)%guests.length];if(active)bubble(active.message,active.x,active.y-84);if(guests.length>3&&!selected){let other=guests[(Math.floor(t/7)+3)%guests.length];if(other!==active&&Math.hypot(other.x-active.x,other.y-active.y)>220)bubble(other.message,other.x,other.y-84)}
 drawPetals(t);requestAnimationFrame(draw)}
 function renderAvatar(){av.clearRect(0,0,126,126);rect(av,36,121,54,4,'#dce5c9');sprite(av,63,80,chosen,3,'',0)}
