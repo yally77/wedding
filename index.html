@@ -26,7 +26,7 @@ dialog{color:var(--ink);border:1px solid #e0e5d1;background:var(--paper);border-
 <body>
 <main class="garden-world" aria-label="우리의 작은 결혼식 방명록">
 <h1 class="sr-only">우리의 작은 결혼식 — 픽셀 정원 방명록 · 결혼 날짜 2026.10.24</h1>
-<canvas id="garden" width="960" height="780" aria-label="Happy Wedding! · 2026.10.24 웨딩 플래카드와 꽃 아치 아래 신랑 정근과 신부 예나, 정원을 산책하는 하객들, 작은 토끼와 다람쥐와 새. 하객을 누르면 메시지를 볼 수 있습니다. 정원 메뉴에서는 모든 방명록을 읽을 수 있습니다."></canvas>
+<canvas id="garden" width="960" height="780" aria-label="Happy Wedding! · 2026.10.24 웨딩 플래카드와 꽃 아치 아래 신랑 정근과 신부 예나, 정원을 산책하는 하객들, 작은 토끼와 다람쥐와 새. 하객을 누르면 메시지를 볼 수 있고, 하객과 소동물은 드래그해서 옮길 수 있습니다. 정원 메뉴에서는 모든 방명록을 읽을 수 있습니다."></canvas>
 <div class="selected-note" id="selectedNote"><b></b><span></span><button aria-label="말풍선 닫기" type="button">×</button></div>
 <nav class="garden-actions" aria-label="방명록 메뉴"><button id="openMenu" class="quiet-menu" type="button" aria-label="정원 메뉴 열기" aria-haspopup="dialog">···</button><button id="openWriter" class="write-button" type="button" aria-haspopup="dialog"><span aria-hidden="true"><svg viewBox="0 0 12 12"><path fill="currentColor" d="M8 1h2v1h1v2H9V3H8zM7 3h2v2H7v2H5v2H3V7h2V5h2zM2 8h1v2h2v1H1V9h1z"/></svg></span> 방명록 쓰기</button></nav>
 </main>
@@ -293,7 +293,7 @@ function animalSprite(c,kind,x,y,flip=false,hop=0){
  }
  c.restore();
 }
-function drawAnimals(t){for(const kind of ['rabbit','squirrel','bird']){const p=animalPosition(kind,t);animalSprite(ctx,kind,p.x,p.y,p.flip,p.hop)}}
+function drawAnimals(t){for(const kind of ['rabbit','squirrel','bird']){const p=displayedAnimal(kind,t);animalSprite(ctx,kind,p.x,p.y,p.flip,p.hop)}}
 // Sparse petals are painted last in the scene, in front of people and speech bubbles.
 // They share the scene clock, so pause and reduced-motion preferences also stop them.
 function petalPositions(t){
@@ -314,7 +314,7 @@ function draw(ts){let dt=Math.max(0,Math.min((ts-lastTime)/1000||0,.06));lastTim
 sprite(ctx,C-49,213,{skin:0,hair:0,color:0,shirt:0},3,'groom',t);sprite(ctx,C+49,213,{skin:0,hair:2,color:0,shirt:0},3,'bride',t+.8);
 ctx.textAlign='center';ctx.font='12px "Noto Sans KR",sans-serif';ctx.fillStyle='#647448';coupleName('정근',C-49,280,'#c6b2dc');coupleName('예나',C+49,280,'#e7b3c4');
 drawHearts(t);drawAnimals(t);
-const order=[...guests].sort((a,b)=>a.y-b.y);for(const g of order){let moving=false;if(!paused&&selected!==g){g.wait-=dt;if(g.wait<=0){let dx=g.targetX-g.x,dy=g.targetY-g.y,d=Math.hypot(dx,dy);if(d<3){g.wait=2+Math.random()*4;g.targetX=Math.max(sceneLayout.left,Math.min(sceneLayout.right,g.x+(Math.random()-.5)*170));g.targetY=Math.max(sceneLayout.top,Math.min(sceneLayout.bottom,g.y+(Math.random()-.5)*125))}else{g.x+=dx/d*12*dt;g.y+=dy/d*12*dt;moving=true}}}sprite(ctx,g.x,g.y,g,3,'',t+g.phase,moving);ctx.font='11px "Noto Sans KR",sans-serif';ctx.textAlign='center';let nw=ctx.measureText(g.name).width;rect(ctx,g.x-nw/2-5,g.y+43,nw+10,17,'#f7f4dfd9');ctx.fillStyle='#60704c';ctx.fillText(g.name,g.x,g.y+55)}
+const order=[...guests].sort((a,b)=>a.y-b.y);for(const g of order){let moving=false;if(!paused&&selected!==g&&dragState?.guest!==g){g.wait-=dt;if(g.wait<=0){let dx=g.targetX-g.x,dy=g.targetY-g.y,d=Math.hypot(dx,dy);if(d<3){g.wait=2+Math.random()*4;g.targetX=Math.max(sceneLayout.left,Math.min(sceneLayout.right,g.x+(Math.random()-.5)*170));g.targetY=Math.max(sceneLayout.top,Math.min(sceneLayout.bottom,g.y+(Math.random()-.5)*125))}else{g.x+=dx/d*12*dt;g.y+=dy/d*12*dt;moving=true}}}sprite(ctx,g.x,g.y,g,3,'',t+g.phase,moving);ctx.font='11px "Noto Sans KR",sans-serif';ctx.textAlign='center';let nw=ctx.measureText(g.name).width;rect(ctx,g.x-nw/2-5,g.y+43,nw+10,17,'#f7f4dfd9');ctx.fillStyle='#60704c';ctx.fillText(g.name,g.x,g.y+55)}
 let active=selected||guests.find(g=>g.newUntil>Date.now())||guests[Math.floor(t/5)%guests.length];if(active)bubble(active.message,active.x,active.y-84);if(guests.length>3&&!selected){let other=guests[(Math.floor(t/7)+3)%guests.length];if(other!==active&&Math.hypot(other.x-active.x,other.y-active.y)>220)bubble(other.message,other.x,other.y-84)}
 drawPetals(t);requestAnimationFrame(draw)}
 function renderAvatar(){av.clearRect(0,0,126,126);rect(av,36,121,54,4,'#dce5c9');sprite(av,63,80,chosen,3,'',0)}
@@ -414,7 +414,74 @@ $('#confirmDelete').onclick=async()=>{
  guests=guests.filter(g=>g.id!==id);if(selected?.id===id){selected=null;$('#selectedNote').style.display='none'}if(editingId===id)clearEdit();pendingDelete=null;$('#deleteConfirm').hidden=true;refreshNotes();renderAdminList();toast('미니미와 방명록을 삭제했어요.')
  }catch(error){$('#adminError').textContent=error.message}finally{posting=false;revision++;$('#confirmDelete').disabled=false}
 };
-canvas.onclick=e=>{let box=canvas.getBoundingClientRect(),x=(e.clientX-box.left)*canvas.width/box.width,y=(e.clientY-box.top)*canvas.height/box.height;let g=[...guests].sort((a,b)=>b.y-a.y).find(g=>Math.abs(g.x-x)<37&&y>g.y-80&&y<g.y+55);if(g)selectGuest(g);else{selected=null;$('#selectedNote').style.display='none'}};canvas.style.cursor='pointer';$('#selectedNote button').onclick=()=>{selected=null;$('#selectedNote').style.display='none'};function motionLabel(){$('#motionToggle').textContent=paused?'▷  움직임 다시 시작':'Ⅱ  움직임 쉬어가기';$('#motionToggle').setAttribute('aria-pressed',paused)}$('#motionToggle').onclick=()=>{paused=!paused;motionLabel()};motionLabel();resizeScene();addEventListener('resize',resizeScene);renderAvatar();refreshNotes();requestAnimationFrame(draw);
+
+let dragState=null;
+const animalDrops=new Map();
+function safeDrop(x,y,type){
+ const L=sceneLayout;
+ x=Math.max(48,Math.min(L.width-48,x));
+ y=Math.max(type==='guest'?L.top:170,Math.min(L.height-76,y));
+ // Keep every draggable silhouette clear of the couple and their platform.
+ if(type==='animal'&&Math.abs(x-L.center)<190&&y<345)y=345;
+ return{x,y};
+}
+function displayedAnimal(kind,t){
+ const base=animalPosition(kind,t),drop=animalDrops.get(kind);
+ if(!drop)return base;
+ if(dragState?.type==='animal'&&dragState.kind===kind)return{...base,x:drop.x,y:drop.y,hop:0};
+ const blend=Math.min(1,Math.max(0,(t-drop.at-6)/12));
+ if(blend>=1){animalDrops.delete(kind);return base}
+ return{...base,...safeDrop(drop.x+(base.x-drop.x)*blend,drop.y+(base.y-drop.y)*blend,'animal'),hop:blend?base.hop:0};
+}
+function pointerPoint(e){
+ const r=canvas.getBoundingClientRect();
+ return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};
+}
+function draggableAt(p){
+ if(Math.abs(p.x-sceneLayout.center)<100&&p.y>125&&p.y<260)return null;
+ const g=[...guests].sort((a,b)=>b.y-a.y).find(g=>Math.abs(g.x-p.x)<43&&p.y>g.y-80&&p.y<g.y+37);
+ if(g)return{type:'guest',guest:g,x:g.x,y:g.y};
+ for(const kind of ['bird','squirrel','rabbit']){
+  const a=displayedAnimal(kind,frame);
+  if(Math.abs(p.x-a.x)<43&&p.y>a.y-(kind==='rabbit'?63:48)&&p.y<a.y+14)return{type:'animal',kind,x:a.x,y:a.y};
+ }
+ return null;
+}
+canvas.style.touchAction='none';
+canvas.onpointerdown=e=>{
+ if(dragState||e.button!==0)return;
+ const p=pointerPoint(e),hit=draggableAt(p);
+ if(!hit){selected=null;$('#selectedNote').style.display='none';return}
+ dragState={...hit,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,offsetX:hit.x-p.x,offsetY:hit.y-p.y,moved:false};
+ canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';e.preventDefault();
+};
+canvas.onpointermove=e=>{
+ if(!dragState){canvas.style.cursor=draggableAt(pointerPoint(e))?'grab':'default';return}
+ const d=dragState;if(e.pointerId!==d.pointerId)return;
+ if(!d.moved&&Math.hypot(e.clientX-d.startX,e.clientY-d.startY)<5)return;
+ d.moved=true;selected=null;$('#selectedNote').style.display='none';
+ const p=pointerPoint(e),next=safeDrop(p.x+d.offsetX,p.y+d.offsetY,d.type);
+ if(d.type==='guest'){d.guest.x=next.x;d.guest.y=next.y}
+ else animalDrops.set(d.kind,{...next,at:frame});
+ e.preventDefault();
+};
+function finishDrag(e,cancel=false){
+ const d=dragState;if(!d||e.pointerId!==d.pointerId)return;
+ dragState=null;
+ if(cancel){
+  if(d.type==='guest'){d.guest.x=d.x;d.guest.y=d.y}
+  else animalDrops.set(d.kind,{x:d.x,y:d.y,at:frame});
+ }else if(d.moved){
+  if(d.type==='guest'){d.guest.targetX=d.guest.x;d.guest.targetY=d.guest.y;d.guest.wait=6}
+  else{const drop=animalDrops.get(d.kind);if(drop)drop.at=frame}
+ }else if(d.type==='guest')selectGuest(d.guest);
+ if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+ canvas.style.cursor='grab';
+}
+canvas.onpointerup=e=>finishDrag(e);
+canvas.onpointercancel=e=>finishDrag(e,true);
+canvas.onlostpointercapture=e=>finishDrag(e,true);
+$('#selectedNote button').onclick=()=>{selected=null;$('#selectedNote').style.display='none'};function motionLabel(){$('#motionToggle').textContent=paused?'▷  움직임 다시 시작':'Ⅱ  움직임 쉬어가기';$('#motionToggle').setAttribute('aria-pressed',paused)}$('#motionToggle').onclick=()=>{paused=!paused;motionLabel()};motionLabel();resizeScene();addEventListener('resize',resizeScene);renderAvatar();refreshNotes();requestAnimationFrame(draw);
 async function syncGuests(){
  if(location.protocol==='file:'||posting||syncing)return;
  if(needsServer){connectionState='unconfigured';$('.privacy').textContent=unavailableMessage;if($('#adminDialog').open)updateAdminUI();return}
