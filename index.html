@@ -312,7 +312,17 @@ function animalSprite(c,kind,x,y,flip=false,hop=0){
  }
  c.restore();
 }
-function drawAnimals(t){for(const kind of ['rabbit','squirrel','bird']){const p=displayedAnimal(kind,t);animalSprite(ctx,kind,p.x,p.y,p.flip,p.hop)}}
+const animalCheers=new Map();
+function drawAnimals(t){for(const kind of ['rabbit','squirrel','bird']){
+ const p=displayedAnimal(kind,t),start=animalCheers.get(kind),age=start===undefined?-1:(Date.now()-start)/1000;
+ const cheering=age>=0&&age<1.6,jump=cheering&&age<1.05?Math.abs(Math.sin(age/1.05*Math.PI*2))*18:0;
+ animalSprite(ctx,kind,p.x,p.y,p.flip,p.hop+jump);
+ if(cheering){
+  const hy=p.y-(kind==='rabbit'?76:60)-jump;
+  if(age<.85){const size=3,pattern=['0110110','1111111','1111111','0111110','0011100','0001000'];pattern.forEach((row,j)=>[...row].forEach((v,i)=>{if(v==='1')rect(ctx,p.x+(i-3)*size,hy+j*size,size,size,'#eb9bb9')}))}
+  else{ctx.save();ctx.globalAlpha=(1.6-age)/.75;for(let i=0;i<8;i++){const angle=i*Math.PI/4,r=8+(age-.85)*35;rect(ctx,p.x+Math.cos(angle)*r,hy+8+Math.sin(angle)*r,4,4,i%2?'#f3c568':'#eb9bb9')}ctx.restore()}
+ }else if(start!==undefined)animalCheers.delete(kind);
+}}
 // Sparse petals are painted last in the scene, in front of people and speech bubbles.
 // They share the scene clock, so pause and reduced-motion preferences also stop them.
 function petalPositions(t){
@@ -519,7 +529,7 @@ function finishDrag(e,cancel=false){
  }else if(d.moved){
   if(d.type==='guest'){d.guest.targetX=d.guest.x;d.guest.targetY=d.guest.y;d.guest.wait=6}
   else{const drop=animalDrops.get(d.kind);if(drop)drop.at=frame}
- }else if(d.type==='guest')selectGuest(d.guest);
+ }else if(d.type==='guest')selectGuest(d.guest);else animalCheers.set(d.kind,Date.now());
  if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
  canvas.style.cursor='grab';
 }
