@@ -6,7 +6,7 @@ import {createHash,randomBytes,randomUUID,timingSafeEqual} from 'node:crypto';
 const root=new URL('./',import.meta.url);
 export const DEFAULT_GUESTS=[{"name":"지은","message":"둘이 함께할 모든 날을 응원해 ♡","skin":0,"hair":9,"color":1,"shirt":3,"id":"example-0","example":true,"accessory":0,"outfit":6},{"name":"민수","message":"결혼 축하해! 행복하게 잘 살아 🌷","skin":1,"hair":4,"color":0,"shirt":2,"id":"example-1","example":true,"accessory":0,"outfit":4},{"name":"수진","message":"오늘 세상에서 제일 예쁜 두 사람!","skin":0,"hair":3,"color":0,"shirt":4,"id":"example-2","example":true,"accessory":0,"outfit":7},{"name":"도윤","message":"웃음 가득한 날들만 이어지길!","skin":2,"hair":1,"color":1,"shirt":1,"id":"example-3","example":true,"accessory":0,"outfit":2},{"name":"유나","message":"오래오래 서로의 가장 좋은 친구로 ♡","skin":1,"hair":7,"color":2,"shirt":0,"id":"example-4","example":true,"accessory":0,"outfit":8},{"name":"현우","message":"두 사람의 새로운 시작을 축하해!","skin":0,"hair":8,"color":0,"shirt":0,"id":"example-5","example":true,"accessory":0,"outfit":5}];
 
-export const validGuest=g=>g&&typeof g.name==='string'&&g.name.trim()&&Array.from(g.name.trim()).length<=10&&typeof g.message==='string'&&g.message.trim()&&Array.from(g.message.trim()).length<=30&&[['skin',4],['hair',10],['color',10],['shirt',10],['outfit',10]].every(([k,n])=>Number.isInteger(g[k])&&g[k]>=0&&g[k]<n)&&(g.accessory===undefined||(Number.isInteger(g.accessory)&&g.accessory>=0&&g.accessory<10));
+export const validGuest=g=>g&&typeof g.name==='string'&&g.name.trim()&&Array.from(g.name.trim()).length<=10&&typeof g.message==='string'&&g.message.trim()&&Array.from(g.message.trim()).length<=50&&[['skin',4],['hair',10],['color',10],['shirt',10],['outfit',10]].every(([k,n])=>Number.isInteger(g[k])&&g[k]>=0&&g[k]<n)&&(g.accessory===undefined||(Number.isInteger(g.accessory)&&g.accessory>=0&&g.accessory<10));
 const cleanGuest=g=>({name:g.name.trim(),message:g.message.trim(),skin:g.skin,hair:g.hair,color:g.color,shirt:g.shirt,outfit:g.outfit,accessory:g.accessory??0});
 const digest=value=>createHash('sha256').update(value).digest();
 const problem=(status,message)=>Object.assign(new Error(message),{status});
@@ -41,14 +41,14 @@ export async function createGuestbook({dataUrl=new URL('guestbook-data.json',roo
    if(path==='/api/guests'&&req.method==='GET')return send(200,guests);
    if(path==='/api/guests'&&req.method==='POST'){
     let input=await body(req);if(input&&input.outfit===undefined)input.outfit=0;
-    if(!validGuest(input))throw problem(400,'이름 10자, 메시지 30자와 아바타 선택을 확인해 주세요.');
+    if(!validGuest(input))throw problem(400,'이름 10자, 메시지 50자와 아바타 선택을 확인해 주세요.');
     const guest={...cleanGuest(input),id:randomUUID(),createdAt:new Date().toISOString()};
     await mutate(current=>({next:[...current,guest],result:guest}));return send(201,guest);
    }
    const match=path.match(/^\/api\/guests\/([^/]+)$/);
    if(match&&['PATCH','DELETE'].includes(req.method)){
     authorized(req);const id=decodeURIComponent(match[1]);let input;
-    if(req.method==='PATCH'){input=await body(req);if(!validGuest(input))throw problem(400,'이름 10자, 메시지 30자와 아바타 선택을 확인해 주세요.')}
+    if(req.method==='PATCH'){input=await body(req);if(!validGuest(input))throw problem(400,'이름 10자, 메시지 50자와 아바타 선택을 확인해 주세요.')}
     const result=await mutate(current=>{const existing=current.find(g=>g.id===id);if(!existing)throw problem(404,'해당 미니미를 찾을 수 없습니다.');
      if(req.method==='DELETE')return {next:current.filter(g=>g.id!==id),result:{ok:true,id}};
      const updated={...existing,...cleanGuest(input),updatedAt:new Date().toISOString()};return {next:current.map(g=>g.id===id?updated:g),result:updated};
