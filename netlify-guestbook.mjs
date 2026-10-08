@@ -39,14 +39,14 @@ export function createHandler(store,password){return async(request,context={})=>
    return send(200,guests);
   }
   if(path==='/api/guests'&&method==='POST'){
-   const input=await body();if(!validGuest(input))throw fail(400,'이름 10자, 메시지 30자와 아바타 선택을 확인해 주세요.');
+   const input=await body();if(!validGuest(input))throw fail(400,'이름 10자, 메시지 50자와 아바타 선택을 확인해 주세요.');
    const guest={...clean(input),id:randomUUID(),createdAt:new Date().toISOString()};
    await update(store,'guests',DEFAULT_GUESTS,guests=>[...guests,guest]);return send(201,guest);
   }
   const match=path.match(/^\/api\/guests\/([^/]+)$/);
   if(match&&['PATCH','DELETE'].includes(method)){
    await auth();const id=decodeURIComponent(match[1]);let input,result;
-   if(method==='PATCH'){input=await body();if(!validGuest(input))throw fail(400,'이름 10자, 메시지 30자와 아바타 선택을 확인해 주세요.')}
+   if(method==='PATCH'){input=await body();if(!validGuest(input))throw fail(400,'이름 10자, 메시지 50자와 아바타 선택을 확인해 주세요.')}
    await update(store,'guests',DEFAULT_GUESTS,guests=>{const existing=guests.find(g=>g.id===id);if(!existing)throw fail(404,'해당 미니미를 찾을 수 없습니다.');if(method==='DELETE'){result={ok:true,id};return guests.filter(g=>g.id!==id)}result={...existing,...clean(input),updatedAt:new Date().toISOString()};return guests.map(g=>g.id===id?result:g)});
    return send(200,result);
   }
