@@ -13,13 +13,22 @@ dialog{color:var(--ink);border:1px solid #e0e5d1;background:var(--paper);border-
 
 #colorOptions,#shirtOptions{display:grid;grid-template-columns:45px repeat(5,minmax(0,1fr));gap:7px 5px;align-items:center}#colorOptions .label,#shirtOptions .label{grid-row:1 / 3;align-self:start;padding-top:8px}.swatch{width:29px;height:29px;justify-self:center}#colorOptions .swatch:nth-of-type(6),#shirtOptions .swatch:nth-of-type(6){grid-column:2}.selected-note:after{content:'';position:absolute;bottom:-8px;left:calc(50% - 7px);width:14px;height:10px;background:#fffef1;clip-path:polygon(0 0,100% 0,50% 100%)}
 @media(max-width:480px){.garden-actions{bottom:76px}}
+
+/* Pixel controls echo the six-unit garden cells without dominating the scene. */
+.garden-actions{gap:12px}
+.garden-actions button{border:0;border-radius:0;background:#fff5dd;backdrop-filter:none;box-shadow:inset 0 0 0 3px #b3b58d;clip-path:polygon(6px 0,calc(100% - 6px) 0,calc(100% - 6px) 3px,calc(100% - 3px) 3px,calc(100% - 3px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 3px) calc(100% - 6px),calc(100% - 3px) calc(100% - 3px),calc(100% - 6px) calc(100% - 3px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 3px),3px calc(100% - 3px),3px calc(100% - 6px),0 calc(100% - 6px),0 6px,3px 6px,3px 3px,6px 3px)}
+.garden-actions .quiet-menu{background:#f0edce;color:#60714e;font-size:0;position:relative}
+.quiet-menu:before{content:'';position:absolute;left:11px;top:20px;width:4px;height:4px;background:currentColor;box-shadow:9px 0 currentColor,18px 0 currentColor}
+.garden-actions .write-button{min-height:44px;font-weight:600;letter-spacing:.2px}
+.garden-actions button:hover,.garden-actions button:focus-visible{background:#fffbe9;box-shadow:inset 0 0 0 3px #7e9365}
+.write-button svg{width:18px;height:18px;display:block;shape-rendering:crispEdges}
 </style></head>
 <body>
 <main class="garden-world" aria-label="우리의 작은 결혼식 방명록">
 <h1 class="sr-only">우리의 작은 결혼식 — 픽셀 정원 방명록 · 결혼 날짜 2026.10.24</h1>
 <canvas id="garden" width="960" height="780" aria-label="Happy Wedding! · 2026.10.24 웨딩 플래카드와 꽃 아치 아래 신랑 정근과 신부 예나, 정원을 산책하는 하객들, 작은 토끼와 다람쥐와 새. 하객을 누르면 메시지를 볼 수 있습니다. 정원 메뉴에서는 모든 방명록을 읽을 수 있습니다."></canvas>
 <div class="selected-note" id="selectedNote"><b></b><span></span><button aria-label="말풍선 닫기" type="button">×</button></div>
-<nav class="garden-actions" aria-label="방명록 메뉴"><button id="openMenu" class="quiet-menu" type="button" aria-label="정원 메뉴 열기" aria-haspopup="dialog">···</button><button id="openWriter" class="write-button" type="button" aria-haspopup="dialog"><span aria-hidden="true">✎</span> 방명록 쓰기</button></nav>
+<nav class="garden-actions" aria-label="방명록 메뉴"><button id="openMenu" class="quiet-menu" type="button" aria-label="정원 메뉴 열기" aria-haspopup="dialog">···</button><button id="openWriter" class="write-button" type="button" aria-haspopup="dialog"><span aria-hidden="true"><svg viewBox="0 0 12 12"><path fill="currentColor" d="M8 1h2v1h1v2H9V3H8zM7 3h2v2H7v2H5v2H3V7h2V5h2zM2 8h1v2h2v1H1V9h1z"/></svg></span> 방명록 쓰기</button></nav>
 </main>
 <dialog id="editorDialog" class="editor-dialog panel" aria-labelledby="editorTitle">
 <div class="editor-heading"><div><div class="panel-kicker">A LITTLE NOTE OF LOVE</div><h2 id="editorTitle">나의 작은 축하를 남겨요</h2></div><button type="button" id="closeEditor" class="dialog-close" aria-label="방명록 작성 창 닫기">×</button></div>
@@ -158,9 +167,12 @@ function tree(x,y){
  rect(b,tx-2*g,ty+10*g,4*g,12*g,'#997c57');
  rect(b,tx-g,ty+10*g,2*g,11*g,'#c4a77d');
  foliage(tx-10*g,ty,[[7,14],[5,16],[3,18],[2,19],[1,20],[0,21],[0,21],[0,21],[0,21],[0,21],[1,20],[1,20],[2,19],[3,18],[5,16],[7,14]],'#aecb8d','#819e65','#c3da9f');
- flower(b,tx-5*g,ty+6*g,g,'#f9dece',false);
- flower(b,tx+4*g,ty+11*g,g,'#fff5d4',false);
- flower(b,tx+2*g,ty+2*g,g,'#f9dece',false);
+ flower(b,tx-5*g,ty+6*g,4,'#f9dece',false);
+ flower(b,tx+4*g,ty+11*g,4,'#fff5d4',false);
+ flower(b,tx+2*g,ty+2*g,4,'#f9dece',false);
+ // Low overlapping grass tufts conceal the square trunk base.
+ foliage(tx-5*g,ty+20*g,[[1,3],[1,5],[0,8],[0,9],[1,8]],'#abc68a','#8fae70','#c1d89e');
+ foliage(tx-g,ty+21*g,[[2,4],[1,5],[0,6],[1,5]],'#b5cf94','#94b276','#c6dca7');
 }
 function planter(x,y){tile(b,x-28,y+20,56,20,'#d0b891');tile(b,x-32,y+16,64,8,'#e0c9a3');bush(x-32,y-8,64);flower(b,x-20,y-4,4,'#f3c3b1');flower(b,x+16,y-12,4,'#fff8dc');flower(b,x+4,y+4,4,'#f8e1a5')}
 
@@ -273,11 +285,11 @@ function animalSprite(c,kind,x,y,flip=false,hop=0){
  const p=(x,y,w,h,col)=>{const left=Math.round(x*4.5),top=Math.round(y*4.5);rect(c,left,top,Math.round((x+w)*4.5)-left,Math.round((y+h)*4.5)-top,col)},eye='#48413e';
  p(-5,2,10,1,'#63795225');c.translate(0,-hop);
  if(kind==='rabbit'){
-  p(-5,-4,9,6,'#c3b6ae');p(-4,-5,7,6,'#fff5e7');p(1,-8,5,6,'#fff5e7');p(1,-13,2,6,'#fff5e7');p(4,-12,2,5,'#fff5e7');p(2,-12,1,4,'#dba7a5');p(5,-11,1,3,'#dba7a5');p(-6,-3,2,2,'#fffaf0');p(-3,1,3,1,'#e6d4c4');p(3,1,3,1,'#e6d4c4');p(4,-6,1,1,eye);p(6,-4,1,1,'#c99793');
+  p(-5,-4,9,6,'#c3b6ae');p(-4,-5,7,6,'#fff5e7');p(0,-9,6,1,'#fff5e7');p(-1,-8,8,5,'#fff5e7');p(0,-3,6,1,'#fff5e7');p(1,-13,2,6,'#fff5e7');p(4,-12,2,5,'#fff5e7');p(2,-12,1,4,'#dba7a5');p(5,-11,1,3,'#dba7a5');p(-6,-3,2,2,'#fffaf0');p(-3,1,3,1,'#e6d4c4');p(3,1,3,1,'#e6d4c4');p(4,-6,1,1,eye);p(3,-4,2,1,'#edbab3');p(7,-4,1,1,'#c99793');
  }else if(kind==='squirrel'){
-  p(-7,-8,4,8,'#9a6c50');p(-8,-7,2,5,'#9a6c50');p(-6,-9,4,2,'#bb8860');p(-5,-7,2,5,'#d2a175');p(-3,-4,7,5,'#b88158');p(-2,-3,4,4,'#dfb88b');p(1,-8,5,5,'#b88158');p(1,-10,2,3,'#a67453');p(4,-9,2,2,'#a67453');p(1,-7,3,1,'#e6c49a');p(4,-6,1,1,eye);p(6,-4,1,1,eye);p(-2,1,3,1,'#8b644a');p(3,1,3,1,'#8b644a');
+  p(-7,-8,4,8,'#9a6c50');p(-8,-7,2,5,'#9a6c50');p(-6,-9,4,2,'#bb8860');p(-5,-7,2,5,'#d2a175');p(-3,-4,7,5,'#b88158');p(-2,-3,4,4,'#dfb88b');p(0,-9,6,1,'#b88158');p(-1,-8,8,5,'#b88158');p(0,-3,6,1,'#dfb88b');p(1,-10,2,3,'#a67453');p(4,-9,2,2,'#a67453');p(1,-7,3,1,'#e6c49a');p(4,-6,1,1,eye);p(3,-4,2,1,'#e8b49c');p(7,-4,1,1,eye);p(-2,1,3,1,'#8b644a');p(3,1,3,1,'#8b644a');
  }else{
-  p(-4,-4,7,5,'#7793b5');p(-3,-2,5,3,'#c3d8e1');p(1,-7,4,5,'#7793b5');p(-6,-3,3,2,'#647fa4');p(-2,-4,4,2,'#9db9cd');p(3,-5,1,1,eye);p(5,-4,2,1,'#d09b65');p(-1,1,1,2,'#a58d68');p(2,1,1,2,'#a58d68');
+  p(-4,-4,7,5,'#7793b5');p(-3,-2,5,3,'#c3d8e1');p(0,-9,5,1,'#7793b5');p(-1,-8,7,5,'#7793b5');p(0,-3,5,1,'#c3d8e1');p(-6,-3,3,2,'#647fa4');p(-2,-4,4,2,'#9db9cd');p(3,-6,1,1,eye);p(3,-4,2,1,'#e2b1aa');p(6,-5,2,1,'#d09b65');p(-1,1,1,2,'#a58d68');p(2,1,1,2,'#a58d68');
  }
  c.restore();
 }
