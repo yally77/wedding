@@ -74,9 +74,10 @@ function sprite(c,x,y,a,scale=3,role='',t=0,walking=false){
  // One visible leg cell at rest; a walking leg extends by exactly one cell.
  p(-3,3,3,1+(step>.25?1:0),skin);p(1,3,3,1+(step<-.25?1:0),skin);
  p(-2,-12,4,1,skin);p(-4,-11,8,1,skin);p(-5,-10,10,1,skin);
- p(-6,-9,12,6,skin);p(-5,-3,10,1,skin);p(-4,-2,8,1,skin);
- // Ten deliberately different hair outlines and fringes.
+ p(-5,-9,10,6,skin);p(-5,-3,10,1,skin);p(-4,-2,8,1,skin);
+ // Earless head: the face stays inside the hair contour; no side skin tabs.
  p(-2,-12,4,1,hair);p(-4,-11,8,1,hair);p(-5,-10,10,1,hair);
+ p(-5,-9,1,4,hair);p(4,-9,1,4,hair);
  switch(hs){
  case 0:p(-5,-9,10,1,hair);p(-5,-8,1,3,hair);p(4,-8,1,2,hair);p(-3,-8,3,1,hair);break;
  case 1:p(-5,-11,2,2,hair);p(-2,-12,2,3,hair);p(2,-12,2,3,hair);p(-6,-9,2,3,hair);p(4,-9,2,3,hair);p(-3,-9,2,2,hair);p(1,-9,2,2,hair);break;
